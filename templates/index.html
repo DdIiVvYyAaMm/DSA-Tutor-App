@@ -4,57 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSA Tutor App</title>
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; }
-        #context { width: 30%; background-color: #4e4e4e; color: white; padding: 20px; }
-        #feedback { background-color: #d3d3d3; padding: 10px; margin-top: 10px; }
-        #question-area { width: 70%; padding: 20px; }
-        #response { width: 100%; height: 100px; margin-top: 10px; }
-        #submit, #next { margin-top: 10px; padding: 10px; }
-        #submit { background-color: #66bb6a; cursor: pointer; }
-        #next { background-color: #b39ddb; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div id="context">
-        <h2>Context</h2>
-        <div id="feedback">Feedback</div>
+    <div class="container">
+        <div id="left-panel">
+            <div id="context" class="section">
+                <h2>Context</h2>
+                <p>Information related to the current question will be shown here.</p>
+            </div>
+            <div id="feedback" class="section">
+                <h3>Feedback</h3>
+                <p>Feedback will appear here after evaluation.</p>
+            </div>
+        </div>
+        <div id="divider">
+            <div id="slider-icon">≡</div>
+        </div>
+        <div id="right-panel">
+            <div id="question-area" class="section">
+                <h3>Question Area</h3>
+                <p>The question will appear here.</p>
+            </div>
+            <div id="answer-area" class="section">
+                <textarea id="response" placeholder="Type your response here..."></textarea>
+                <button id="submit" class="button">Submit</button>
+                <button id="next" class="button">Next Question</button>
+            </div>
+        </div>
     </div>
-    <div id="question-area">
-        <h3 id="question">How old is the planet Earth?</h3>
-        <textarea id="response" placeholder="Type your response here..."></textarea>
-        <button id="submit" onclick="submitAnswer()">Submit</button>
-        <button id="next" onclick="nextQuestion()">Next Question</button>
-    </div>
 
-    <script>
-        function submitAnswer() {
-            const question = document.getElementById('question').textContent;
-            const userResponse = document.getElementById('response').value;
-            
-            if (!userResponse.trim()) {
-                alert('Please enter your response!');
-                return;
-            }
-
-            fetch('/evaluate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ question: question, user_response: userResponse }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('feedback').textContent = data.feedback;
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        function nextQuestion() {
-            // Logic for loading the next question can go here
-            alert('Next question functionality is not implemented yet.');
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
