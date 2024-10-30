@@ -1,3 +1,5 @@
+let currentQuestionId = 1;
+
 document.getElementById('submit').addEventListener('click', submitAnswer);
 document.getElementById('next').addEventListener('click', nextQuestion);
 
@@ -32,6 +34,82 @@ document.addEventListener('mouseup', () => {
     isResizing = false;
     document.body.style.cursor = 'default';
 });
+
+function loadQuestion(questionId) {
+    fetch('/get_question', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question_id: questionId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById('question-area').textContent = data.error;
+        } else {
+            document.getElementById('question-area').textContent = data.question_text;
+            if (data.question_type === 'mcq' && data.options) {
+                displayOptions(data.options);
+            } else {
+                clearOptions();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function displayOptions(options) {
+    const answerArea = document.getElementById('answer-area');
+    answerArea.innerHTML = '';
+    options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'button option';
+        button.textContent = option;
+        button.addEventListener('click', () => selectOption(option));
+        answerArea.appendChild(button);
+    });
+    addResponseAreaAndButtons(answerArea);
+}
+
+function clearOptions() {
+    // document.getElementById('answer-area').innerHTML = '<textarea id="response" placeholder="Type your response here..."></textarea>';
+    const answerArea = document.getElementById('answer-area');
+    answerArea.innerHTML = '';  // Clear only options, not buttons
+
+    // Add response area and buttons
+    addResponseAreaAndButtons(answerArea);
+}
+
+function addResponseAreaAndButtons(answerArea) {
+    // Text area for user response (if required)
+    const responseTextArea = document.createElement('textarea');
+    responseTextArea.id = 'response';
+    responseTextArea.placeholder = "Type your response here...";
+    answerArea.appendChild(responseTextArea);
+
+    // Submit button
+    const submitButton = document.createElement('button');
+    submitButton.id = 'submit';
+    submitButton.className = 'button';
+    submitButton.textContent = 'Submit';
+    submitButton.addEventListener('click', submitAnswer);
+    answerArea.appendChild(submitButton);
+
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.id = 'next';
+    nextButton.className = 'button';
+    nextButton.textContent = 'Next Question';
+    nextButton.addEventListener('click', nextQuestion);
+    answerArea.appendChild(nextButton);
+}
+
+function selectOption(option) {
+    document.getElementById('response').value = option;
+}
 
 function submitAnswer() {
     const question = document.getElementById('question-area').textContent;
@@ -69,5 +147,9 @@ function submitAnswer() {
 }
 
 function nextQuestion() {
-    alert('Next question functionality is not implemented yet.');
+    currentQuestionId += 1;
+    loadQuestion(currentQuestionId);
 }
+
+// Load the first question on page load
+loadQuestion(currentQuestionId);

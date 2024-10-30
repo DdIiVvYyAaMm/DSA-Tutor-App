@@ -1,0 +1,4 @@
+question_text,question_type,options
+What is the capital of France?,mcq,"[""Paris"", ""London"", ""Berlin"", ""Madrid""]"
+Explain the concept of recursion in computer science.,text,
+Which language is primarily used for web development?,mcq,"[""Python"", ""JavaScript"", ""C++"", ""Java""]"
