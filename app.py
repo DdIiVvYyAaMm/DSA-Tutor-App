@@ -1,21 +1,44 @@
 from flask import Flask, render_template, request, jsonify
+import sqlite3
+import json
 from openai import OpenAI
 import os
 
 app = Flask(__name__)
-
-# Set up your OpenAI API key
-# openai.api_key = 'sk-ZOKZQKJHyFtg0FoSTwulp8jtOOD7zaTCm9kyWm6sR_T3BlbkFJ3X0ZsZOPWFodjdaguOGbXqLLa-aZs2EzEmPfUQ-Z4A'
 
 client = OpenAI(
     # This is the default and can be omitted
     api_key=os.getenv("OPENAI_API_KEY"),
 )
 
+def get_question_by_id(question_id):
+    conn = sqlite3.connect('questions.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM questions WHERE id=?", (question_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return {
+            "id": row[0],
+            "question_text": row[1],
+            "question_type": row[2],
+            "options": json.loads(row[3]) if row[3] else None
+        }
+    else:
+        return None
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/get_question', methods=['POST'])
+def get_question():
+    question_id = request.json.get('question_id', 1)  # Default to question 1
+    question = get_question_by_id(question_id)
+    if question:
+        return jsonify(question)
+    else:
+        return jsonify({"error": "Question not found"}), 404
 
 @app.route('/evaluate', methods=['POST'])
 def evaluate():
@@ -51,7 +74,3 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-
-
-
-# openai.api_key = 'sk-ZOKZQKJHyFtg0FoSTwulp8jtOOD7zaTCm9kyWm6sR_T3BlbkFJ3X0ZsZOPWFodjdaguOGbXqLLa-aZs2EzEmPfUQ-Z4A'
