@@ -37,8 +37,19 @@ with open('questions.csv', 'r', encoding='utf-8') as file:
         INSERT INTO questions (question_text, question_type, options) VALUES (?, ?, ?)
         ''', (question_text, question_type, options))
 
+# Create the users table to track progress
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY,
+    questions_attempted INTEGER DEFAULT 0,
+    questions_correct INTEGER DEFAULT 0,
+    correct_ids TEXT,
+    incorrect_ids TEXT
+)
+''')
+
 # Commit changes and close the database connection
 conn.commit()
 conn.close()
 
-print("Questions have been imported successfully from CSV.")
+print("Questions have been imported successfully from CSV and User Database initialized.")

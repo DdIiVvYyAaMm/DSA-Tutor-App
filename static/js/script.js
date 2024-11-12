@@ -138,6 +138,7 @@ function submitAnswer() {
             document.getElementById('feedback').textContent = `Error: ${data.error}`;
         } else {
             document.getElementById('feedback').textContent = data.feedback;
+            updateProgress()
         }
     })
     .catch(error => {
@@ -149,6 +150,16 @@ function submitAnswer() {
 function nextQuestion() {
     currentQuestionId += 1;
     loadQuestion(currentQuestionId);
+}
+
+function updateProgress() {
+    fetch('/user_progress')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('questions-attempted').innerText = data.questions_attempted;
+        document.getElementById('questions-correct').innerText = data.questions_correct;
+    })
+    .catch(error => console.error('Error updating progress:', error));
 }
 
 // Load the first question on page load

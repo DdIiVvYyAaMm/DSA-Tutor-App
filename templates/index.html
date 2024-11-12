@@ -22,6 +22,11 @@
             <div id="slider-icon">≡</div>
         </div>
         <div id="right-panel">
+            <div id="progress-container">
+                <p>Username: <span id="username">{{ session['username'] }}</span></p>
+                <p>Questions Attempted: <span id="questions-attempted">{{ session['questions_attempted'] }}</span></p>
+                <p>Questions Correct: <span id="questions-correct">{{ session['questions_correct'] }}</span></p>
+            </div>
             <div id="question-area" class="section">
                 <h3>Question Area</h3>
                 <p>The question will appear here.</p>
