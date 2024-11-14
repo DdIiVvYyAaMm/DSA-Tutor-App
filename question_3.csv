@@ -47,7 +47,7 @@ def traversal_algorithm(root, result):
         traversal_algorithm(root.left, result)
         traversal_algorithm(root.right, result)
 ",images/question_3_music.png
-normal,What is the output of the code below? Briefly explain what the function does. ,B,D,A,C,B,In-order traversal to find the lexicographically minimum value,"class Node:
+normal,What is the output of the code below? Briefly explain what the function does. ,B,D,A,C,C,In-order traversal to find the lexicographically minimum value,"class Node:
     def __init__(self, key):
         self.left = None
         self.right = None
