@@ -1,0 +1,72 @@
+personalization,question,option_1,option_2,option_3,option_4,mcq_answer,code
+normal,"This function searches for a specific element (key) in a binary tree. It returns the node containing the key if found, otherwise it returns None. What is the time complexity of this algorithm?",O(1),O(log n),O(n),O(n^2),C,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def search(root, key):
+    if root is None or root.val == key:
+        return root
+    if root.val < key:
+        return traversal_algorithm(root.right, key)
+    return traversal_algorithm(root.left, key)
+"
+normal,"This function performs an inorder (left, root, right) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(n),O(log n),O(n^2),O(1),A,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def inorder_traversal(root):
+    res = []
+    if root:
+        res = traversal_algorithm(root.left)
+        res.append(root.val)
+        res = res + traversal_algorithm(root.right)
+    return res
+"
+normal,"This function inserts a new element (key) into a binary search tree (BST). It returns the root of the modified tree after the insertion. What is the time complexity of this algorithm?
+",O(n),O(log n),O(n^2),O(1),B,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def insert(root, key):
+    if root is None:
+        return Node(key)
+    if key < root.val:
+        root.left = traversal_algorithm(root.left, key)
+    else:
+        root.right = traversal_algorithm(root.right, key)
+    return root
+"
+normal,"This function performs a preorder (root, left, right) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(n),O(log n),O(n^2),O(1),A,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def preorder_traversal(root):
+    res = []
+    if root:
+        res.append(root.val)
+        res = res + traversal_algorithm(root.left)
+        res = res + traversal_algorithm(root.right)
+    return res
+"
+normal,"This function performs a postorder (left, right, root) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(log n),O(n),O(n^2),O(1),B,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def postorder_traversal(root):
+    res = []
+    if root:
+        res = traversal_algorithm(root.left)
+        res = res + traversal_algorithm(root.right)
+        res.append(root.val)
+    return res
+"
