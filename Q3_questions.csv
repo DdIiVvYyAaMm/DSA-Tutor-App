@@ -235,7 +235,7 @@ def traversal_algorithm(root):
     current_max = max(root.key, left_max, right_max)
     return current_max
 ",Q3_tree_images/question_3_harry_potter.png
-3,5,recipe,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","You are categorizing salad ingredients in a systematic tree structure, where each node holds a different ingredient. To label the ingredients properly, you need to find the one that appears last alphabetically among all entries.You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Lettuce,Tomato,Onion,Cucumber,B,In-order traversal to find the lexicographically maximum value,"class Node:
+3,5,R,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","You are categorizing salad ingredients in a systematic tree structure, where each node holds a different ingredient. To label the ingredients properly, you need to find the one that appears last alphabetically among all entries.You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Lettuce,Tomato,Onion,Cucumber,B,In-order traversal to find the lexicographically maximum value,"class Node:
     def __init__(self, key):
         self.left = None
         self.right = None
@@ -249,7 +249,7 @@ def traversal_algorithm(root):
     current_max = max(root.key, left_max, right_max)
     return current_max
 ",Q3_tree_images/question_3_recipe.png
-3,5,music,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","You are curating a vast collection of music genres arranged in a hierarchical tree structure. Among all these genres, you want to find the one that comes last alphabetically. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Rock,Jazz,Funk,Classical,A,In-order traversal to find the lexicographically maximum value,"class Node:
+3,5,M,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","You are curating a vast collection of music genres arranged in a hierarchical tree structure. Among all these genres, you want to find the one that comes last alphabetically. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Rock,Jazz,Funk,Classical,A,In-order traversal to find the lexicographically maximum value,"class Node:
     def __init__(self, key):
         self.left = None
         self.right = None
