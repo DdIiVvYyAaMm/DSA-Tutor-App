@@ -1,44 +1,48 @@
+/* Base styles */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-}
-
-.container {
+  }
+  
+  /* Layout containers */
+  .container {
     display: flex;
     height: 100vh;
     overflow: hidden;
-}
-
-#left-panel, #right-panel {
+  }
+  
+  /* Panel common styles */
+  #left-panel,
+  #right-panel {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-}
-
-#left-panel {
+  }
+  
+  /* Left panel specific */
+  #left-panel {
     background-color: #4e4e4e;
     color: white;
     min-width: 0;
     max-width: 80%;
-    display: flex;
-    flex-direction: column;
     justify-content: space-between;
-}
-
-#right-panel {
+  }
+  
+  /* Right panel specific */
+  #right-panel {
     background-color: #f4f4f4;
-    flex-grow: 1;
     min-width: 200px;
-}
-
-#divider {
+  }
+  
+  /* Divider styles */
+  #divider {
     width: 5px;
     background-color: #ccc;
     cursor: col-resize;
     position: relative;
-}
-
-#slider-icon {
+  }
+  
+  #slider-icon {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -47,9 +51,10 @@ body {
     color: #666;
     cursor: col-resize;
     user-select: none;
-}
-
-.section {
+  }
+  
+  /* Section styles */
+  .section {
     border: 1px solid #ccc;
     padding: 20px;
     display: flex;
@@ -57,19 +62,145 @@ body {
     justify-content: center;
     align-items: center;
     height: 50%;
-}
-
-.button {
+  }
+  
+  /* Button styles */
+  .button {
     margin: 10px;
-    padding: 10px;
+    padding: 8px 16px;
     cursor: pointer;
     background-color: #66bb6a;
     border: none;
     color: white;
-}
-
-#response {
+    border-radius: 4px;
+  }
+  
+  .button:hover {
+    background-color: #4caf50;
+  }
+  
+  .button-container {
+    background-color: #f4f4f4;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  /* Response textarea */
+  #response {
     width: 90%;
     height: 60px;
     margin-top: 10px;
+  }
+  
+  /* Answer area styles */
+  #answer-area {
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+  }
+  
+  #answer-area iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+    min-height: 500px;
+  }
+  
+  /* Embed mode styles */
+  .iframe-container {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .parsons-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+  }
+  
+  /* Q5 mode specific styles */
+  #right-panel.q5-mode {
+    overflow-y: hidden;
+  }
+  
+  #right-panel.q5-mode #question-area {
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+  }
+  
+  #right-panel.q5-mode #answer-area {
+    flex: 1 1 auto;
+    height: calc(100vh - 150px);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Non-Q5 mode styles */
+  #right-panel:not(.q5-mode) #question-area,
+  #right-panel:not(.q5-mode) #answer-area {
+    flex: 1;
+    height: 50%;
+    padding: 20px;
+  }
+  /* Add this to your existing style.css */
+
+/* Progress bar container styles */
+#progress-container {
+    padding: 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+}
+
+.progress-bar-container {
+    margin: 15px 0;
+}
+
+.progress-label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+    border-radius: 5px;
+}
+
+#attempted-bar {
+    background-color: #4CAF50;
+}
+
+#correct-bar {
+    background-color: #2196F3;
 }

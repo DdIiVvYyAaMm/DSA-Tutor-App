@@ -1,79 +1,123 @@
+// Constants
+const MINIMUM_LEFT_PANEL_WIDTH = 5;
+const MINIMUM_RIGHT_PANEL_WIDTH = 200;
+
+// State
 let currentQuestionId = 1;
-
-document.getElementById('submit').addEventListener('click', submitAnswer);
-document.getElementById('next').addEventListener('click', nextQuestion);
-
 let isResizing = false;
-const divider = document.getElementById('divider');
-const leftPanel = document.getElementById('left-panel');
-const rightPanel = document.getElementById('right-panel');
 
-// Mouse down event to start resizing
-divider.addEventListener('mousedown', (e) => {
+// DOM Elements
+const elements = {
+    divider: document.getElementById('divider'),
+    leftPanel: document.getElementById('left-panel'),
+    rightPanel: document.getElementById('right-panel'),
+    questionArea: document.getElementById('question-area'),
+    answerArea: document.getElementById('answer-area'),
+    feedback: document.getElementById('feedback')
+};
+
+// Panel Resizing Logic
+function initializeResizing() {
+    elements.divider.addEventListener('mousedown', startResizing);
+    document.addEventListener('mousemove', handleResize);
+    document.addEventListener('mouseup', stopResizing);
+}
+
+function startResizing(e) {
     isResizing = true;
     document.body.style.cursor = 'col-resize';
-});
+}
 
-// Mouse move event to resize the panels
-document.addEventListener('mousemove', (e) => {
+function handleResize(e) {
     if (!isResizing) return;
 
-    // Get the mouse position relative to the container
-    const newWidth = e.clientX;
     const containerWidth = document.querySelector('.container').offsetWidth;
+    const newWidth = e.clientX;
 
-    // Allow the left panel to be minimized to 5px while ensuring the right panel has at least 200px
-    if (newWidth >= 5 && newWidth <= containerWidth - 200) {
-        leftPanel.style.width = `${newWidth}px`;
-        rightPanel.style.width = `${containerWidth - newWidth - 5}px`; // Adjust right panel width dynamically
+    if (newWidth >= MINIMUM_LEFT_PANEL_WIDTH && newWidth <= containerWidth - MINIMUM_RIGHT_PANEL_WIDTH) {
+        elements.leftPanel.style.width = `${newWidth}px`;
+        elements.rightPanel.style.width = `${containerWidth - newWidth - 5}px`;
     }
-});
+}
 
-// Mouse up event to stop resizing
-document.addEventListener('mouseup', () => {
+function stopResizing() {
     isResizing = false;
     document.body.style.cursor = 'default';
-});
+}
 
-function loadQuestion(questionId) {
-    fetch('/get_question', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ question_id: questionId }),
-    })
-    .then(response => response.json())
-    .then(data => {
+// UI Components
+function createButton(text, clickHandler, className = 'button') {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.className = className;
+    button.addEventListener('click', clickHandler);
+    return button;
+}
+
+function createResponseArea() {
+    const textarea = document.createElement('textarea');
+    textarea.id = 'response';
+    textarea.placeholder = "Type your response here...";
+    return textarea;
+}
+
+function createIframeContainer(url) {
+    const container = document.createElement('div');
+    container.className = 'iframe-container';
+    
+    const iframe = document.createElement('iframe');
+    iframe.src = url;
+    iframe.className = 'parsons-iframe';
+    
+    container.appendChild(iframe);
+    return container;
+}
+
+// Question Management
+async function loadQuestion(questionId) {
+    try {
+        const response = await fetch('/get_question', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question_id: questionId })
+        });
+        
+        const data = await response.json();
         if (data.error) {
-            document.getElementById('question-area').textContent = data.error;
-        } else {
-            document.getElementById('question-area').textContent = data.question_text;
-            if (data.question_type === 'mcq' && data.options) {
-                displayOptions(data.options);
-            } else {
-                clearOptions();
-            }
+            elements.questionArea.textContent = data.error;
+            return;
         }
-    })
-    .catch(error => {
+
+        elements.questionArea.textContent = data.question_text;
+        
+        if (data.is_embed && data.url) {
+            handleEmbedQuestion(data.url);
+        } else {
+            handleRegularQuestion(data);
+        }
+    } catch (error) {
         console.error('Error:', error);
-    });
+        elements.questionArea.textContent = 'Error loading question';
+    }
 }
 
-function displayOptions(options) {
-    const answerArea = document.getElementById('answer-area');
-    answerArea.innerHTML = '';
-    options.forEach(option => {
-        const button = document.createElement('button');
-        button.className = 'button option';
-        button.textContent = option;
-        button.addEventListener('click', () => selectOption(option));
-        answerArea.appendChild(button);
-    });
-    addResponseAreaAndButtons(answerArea);
+function handleEmbedQuestion(url) {
+    elements.rightPanel.classList.add('q5-mode');
+    elements.answerArea.innerHTML = '';
+    
+    const iframeContainer = createIframeContainer(url);
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.style.padding = '10px';
+    buttonContainer.style.textAlign = 'center';
+    
+    buttonContainer.appendChild(createButton('Next Question', nextQuestion));
+    
+    elements.answerArea.appendChild(iframeContainer);
+    elements.answerArea.appendChild(buttonContainer);
 }
 
+<<<<<<< Updated upstream
 function clearOptions() {
     // document.getElementById('answer-area').innerHTML = '<textarea id="response" placeholder="Type your response here..."></textarea>';
     const answerArea = document.getElementById('answer-area');
@@ -81,69 +125,59 @@ function clearOptions() {
 
     // Add response area and buttons
     addResponseAreaAndButtons(answerArea);
+=======
+function handleRegularQuestion(data) {
+    elements.rightPanel.classList.remove('q5-mode');
+    elements.answerArea.innerHTML = '';
+    
+    if (data.question_type === 'mcq' && data.options) {
+        data.options.forEach(option => {
+            const optionButton = createButton(option, () => selectOption(option), 'button option');
+            elements.answerArea.appendChild(optionButton);
+        });
+    }
+    
+    elements.answerArea.appendChild(createResponseArea());
+    elements.answerArea.appendChild(createButton('Submit', submitAnswer));
+    elements.answerArea.appendChild(createButton('Next Question', nextQuestion));
+>>>>>>> Stashed changes
 }
 
-function addResponseAreaAndButtons(answerArea) {
-    // Text area for user response (if required)
-    const responseTextArea = document.createElement('textarea');
-    responseTextArea.id = 'response';
-    responseTextArea.placeholder = "Type your response here...";
-    answerArea.appendChild(responseTextArea);
-
-    // Submit button
-    const submitButton = document.createElement('button');
-    submitButton.id = 'submit';
-    submitButton.className = 'button';
-    submitButton.textContent = 'Submit';
-    submitButton.addEventListener('click', submitAnswer);
-    answerArea.appendChild(submitButton);
-
-    // Next button
-    const nextButton = document.createElement('button');
-    nextButton.id = 'next';
-    nextButton.className = 'button';
-    nextButton.textContent = 'Next Question';
-    nextButton.addEventListener('click', nextQuestion);
-    answerArea.appendChild(nextButton);
-}
-
-function selectOption(option) {
-    document.getElementById('response').value = option;
-}
-
-function submitAnswer() {
-    const question = document.getElementById('question-area').textContent;
+// Answer Handling
+async function submitAnswer() {
     const userResponse = document.getElementById('response').value;
-
+    
     if (!userResponse.trim()) {
         alert('Please enter your response!');
         return;
     }
 
-    fetch('/evaluate', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ question: question, user_response: userResponse }),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+    try {
+        const response = await fetch('/evaluate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question: elements.questionArea.textContent,
+                user_response: userResponse
+            })
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        elements.feedback.textContent = data.error ? `Error: ${data.error}` : data.feedback;
+        
+        if (!data.error) {
+            updateProgress();
         }
-        return response.json(); // Make sure this matches the server response type
-    })
-    .then(data => {
-        if (data.error) {
-            document.getElementById('feedback').textContent = `Error: ${data.error}`;
-        } else {
-            document.getElementById('feedback').textContent = data.feedback;
-        }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
-        document.getElementById('feedback').textContent = 'An error occurred. Please try again.';
-    });
+        elements.feedback.textContent = 'An error occurred. Please try again.';
+    }
+}
+
+function selectOption(option) {
+    document.getElementById('response').value = option;
 }
 
 function nextQuestion() {
@@ -151,5 +185,35 @@ function nextQuestion() {
     loadQuestion(currentQuestionId);
 }
 
+<<<<<<< Updated upstream
 // Load the first question on page load
 loadQuestion(currentQuestionId);
+=======
+// Progress Tracking
+async function updateProgress() {
+    try {
+        const response = await fetch('/user_progress');
+        const data = await response.json();
+        
+        // Calculate percentages
+        const totalQuestions = data.total_questions || 10; // Fallback to 10 if not provided
+        const attemptedPercentage = (data.questions_attempted / totalQuestions) * 100;
+        const correctPercentage = data.questions_attempted ? 
+            (data.questions_correct / data.questions_attempted) * 100 : 0;
+        
+        // Update progress bars
+        const attemptedBar = document.getElementById('attempted-bar');
+        const correctBar = document.getElementById('correct-bar');
+        
+        attemptedBar.style.width = `${attemptedPercentage}%`;
+        correctBar.style.width = `${correctPercentage}%`;
+        
+    } catch (error) {
+        console.error('Error updating progress:', error);
+    }
+}
+
+// Initialize
+initializeResizing();
+loadQuestion(currentQuestionId);
+>>>>>>> Stashed changes
