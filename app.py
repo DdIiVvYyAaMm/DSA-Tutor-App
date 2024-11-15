@@ -4,9 +4,6 @@ import os
 
 app = Flask(__name__)
 
-# Set up your OpenAI API key
-# openai.api_key = 'sk-ZOKZQKJHyFtg0FoSTwulp8jtOOD7zaTCm9kyWm6sR_T3BlbkFJ3X0ZsZOPWFodjdaguOGbXqLLa-aZs2EzEmPfUQ-Z4A'
-
 client = OpenAI(
     # This is the default and can be omitted
     api_key=os.getenv("OPENAI_API_KEY"),
