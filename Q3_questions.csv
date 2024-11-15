@@ -1,0 +1,265 @@
+question_no,sub_question,theme,tree_dependency,question,option_a,option_b,option_c,option_d,mcq_answer,function,code,tree_image_path
+3,1,B,"A->[B,C]; B->[D,E]; C->[]; D->[]; E->[];",What is the output of the code below? Briefly explain what the function does. ,"[A, B, D, E, C]","[D, B, E, A, C]","[A, C, B, D, E]","[C, A, B, D, E]",A,Pre-order traversal to collect all node values,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root, result):
+    if root:
+        result.append(root.key)
+        traversal_algorithm(root.left, result)
+        traversal_algorithm(root.right, result)
+",Q3_tree_images/question_3_normal.png
+3,1,H,"Harry->[Hermione,Ron]; Hermione->[Dobby,Luna]; Ron->[]; Dobby->[]; Luna->[];",Imagine you are at Hogwarts School of Witchcraft and Wizardry and you have been assigned a task by Professor McGonagall. Your task is to visit a series of magical artifacts. The artifacts are owned by your favorite Hogwarts legends. You must visit each character in a specific order to get their artifact. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.,"[Harry, Hermione, Dobby, Luna, Ron]","[Dobby, Hermione, Luna, Harry, Ron]","[Harry, Ron, Hermione, Dobby, Luna]","[Ron, Harry, Hermione, Luna, Dobby]",A,Pre-order traversal to collect all node values,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root, result):
+    if root:
+        result.append(root.key)
+        traversal_algorithm(root.left, result)
+        traversal_algorithm(root.right, result)
+",Q3_tree_images/question_3_harry_potter.png
+3,1,R,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","You are a master chef preparing a delicious salad for a prestigious culinary competition. The ingredients need to be collected in a very specific order to ensure the flavors blend perfectly. The ingredients are organized in a hierarchical manner, starting with the base ingredient and branching out to secondary and tertiary ingredients. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.","[Lettuce, Tomato, Carrot, Onion, Cucumber]","[Carrot, Tomato, Onion, Lettuce, Cucumber]","[Lettuce, Cucumber, Tomato, Carrot, Onion]","[Cucumber, Lettuce, Tomato, Onion, Carrot]",A,Pre-order traversal to collect all node values,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root, result):
+    if root:
+        result.append(root.key)
+        traversal_algorithm(root.left, result)
+        traversal_algorithm(root.right, result)
+",Q3_tree_images/question_3_recipe.png
+3,1,M,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","As a curator of a renowned music festival, you are tasked with organizing the band line-ups based on different music genres. The genres are structured in a hierarchical tree where you start with the main genre and branch out to sub-genres. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.","[Rock, Jazz, Blues, Funk, Classical]","[Blues, Jazz, Funk, Rock, Classical]","[Rock, Classical, Jazz, Blues, Funk]","[Classical, Rock, Jazz, Funk, Blues]",A,Pre-order traversal to collect all node values,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root, result):
+    if root:
+        result.append(root.key)
+        traversal_algorithm(root.left, result)
+        traversal_algorithm(root.right, result)
+",Q3_tree_images/question_3_music.png
+3,2,B,"A->[B,C]; B->[D,E]; C->[]; D->[]; E->[];",What is the output of the code below? Briefly explain what the function does. ,B,D,A,C,C,In-order traversal to find the lexicographically minimum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_min = traversal_algorithm(root.left)
+    right_min = traversal_algorithm(root.right)
+    current_min = min(root.key, left_min, right_min)
+    return current_min
+",Q3_tree_images/question_3_normal.png
+3,2,H,"Harry->[Hermione,Ron]; Hermione->[Dobby,Luna]; Ron->[]; Dobby->[]; Luna->[];","You have come across a collection of magical tomes guarded by Harry Potter characters, organized in a binary search tree. To find the most challenging tome, you need to identify the character that appears first lexicographically (alphabetically). You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Harry,Ron,Dobby,Luna,C,In-order traversal to find the lexicographically minimum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_min = traversal_algorithm(root.left)
+    right_min = traversal_algorithm(root.right)
+    current_min = min(root.key, left_min, right_min)
+    return current_min
+",Q3_tree_images/question_3_harry_potter.png
+3,2,R,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","You are categorizing salad ingredients in a systematic tree structure, where each node holds a different ingredient. To label the ingredients properly, you need to find the one that appears first alphabetically among all entries. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Carrot,Cucumber,Tomato,Lettuce,A,In-order traversal to find the lexicographically minimum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_min = traversal_algorithm(root.left)
+    right_min = traversal_algorithm(root.right)
+    current_min = min(root.key, left_min, right_min)
+    return current_min
+",Q3_tree_images/question_3_recipe.png
+3,2,M,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","You are curating a vast collection of music genres arranged in a hierarchical tree structure. Among all these genres, you want to find the one that comes first alphabetically. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Rock,Blues,Jazz,Classical,B,In-order traversal to find the lexicographically minimum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_min = traversal_algorithm(root.left)
+    right_min = traversal_algorithm(root.right)
+    current_min = min(root.key, left_min, right_min)
+    return current_min
+",Q3_tree_images/question_3_music.png
+3,3,B,"A->[B,C]; B->[D,E]; C->[]; D->[]; E->[];",What is the output of the code below? Briefly explain what the function does. ,1,2,3,4,C,Post-order traversal to count leaf nodes,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    if not root.left and not root.right:
+        return 1
+    return traversal_algorithm(root.left) + traversal_algorithm(root.right)
+",Q3_tree_images/question_3_normal.png
+3,3,H,"Harry->[Hermione,Ron]; Hermione->[Dobby,Luna]; Ron->[]; Dobby->[]; Luna->[];","Professor Sprout has an enchanted garden with various magical plants, each planted by characters from the Harry Potter series. A leaf node in this tree represents an individual plant with no further branches. Professor Sprout needs your help to count how many individual plants (leaf nodes) there are in the garden. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",1,2,3,4,C,Post-order traversal to count leaf nodes,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    if not root.left and not root.right:
+        return 1
+    return traversal_algorithm(root.left) + traversal_algorithm(root.right)
+",Q3_tree_images/question_3_harry_potter.png
+3,3,R,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","As a chef, you are finalizing your salad recipe which involves a hierarchical arrangement of ingredients. Some ingredients are fundamental and have no further sub-ingredients, represented as leaf nodes in a tree. To ensure you have all necessary base ingredients, you need to count these leaf nodes. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",1,2,3,4,C,Post-order traversal to count leaf nodes,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    if not root.left and not root.right:
+        return 1
+    return traversal_algorithm(root.left) + traversal_algorithm(root.right)
+",Q3_tree_images/question_3_recipe.png
+3,3,M,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","As the curator of a diverse music festival, you have a hierarchical representation of music genres where each genre can further branch into sub-genres. Some branches terminate in specific types of music with no further divisions, represented as leaf nodes. To gauge the diversity, you need to count these leaf nodes representing distinct music styles. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",1,2,3,4,C,Post-order traversal to count leaf nodes,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    if not root.left and not root.right:
+        return 1
+    return traversal_algorithm(root.left) + traversal_algorithm(root.right)
+",Q3_tree_images/question_3_music.png
+3,4,B,"A->[B,C]; B->[D,E]; C->[]; D->[]; E->[];",What is the output of the code below? Briefly explain what the function does. ,2,3,4,5,A,Find the depth of the tree,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    left_depth = traversal_algorithm(root.left)
+    right_depth = traversal_algorithm(root.right)
+    return max(left_depth, right_depth) + 1
+",Q3_tree_images/question_3_normal.png
+3,4,H,"Harry->[Hermione,Ron]; Hermione->[Dobby,Luna]; Ron->[]; Dobby->[]; Luna->[];","Professor Dumbledore has discovered an ancient magical artifact and has tasked you with determining how complex it is to navigate through its protections. The protections are layered in a tree structure where each node represents a character helping guard the artifact. Starting from the root character, each branching layer represents additional characters. Your objective is to find out how many layers deep the protection goes, which corresponds to the depth of the tree. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",2,3,4,5,A,Find the depth of the tree,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    left_depth = traversal_algorithm(root.left)
+    right_depth = traversal_algorithm(root.right)
+    return max(left_depth, right_depth) + 1
+",Q3_tree_images/question_3_harry_potter.png
+3,4,R,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","As a renowned chef, you are developing a sophisticated salad recipe that includes layers of ingredients. Each layer builds upon the previous one starting from a base ingredient. The depth of this recipe tree represents how many layers of ingredients you have from the base ingredient to the most complex, final touches. Your goal is to document the complexity of your new salad masterpiece. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",2,3,4,5,A,Find the depth of the tree,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    left_depth = traversal_algorithm(root.left)
+    right_depth = traversal_algorithm(root.right)
+    return max(left_depth, right_depth) + 1
+",Q3_tree_images/question_3_recipe.png
+3,4,M,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","You are organizing a massive music festival and need to ensure a seamless transition between genres, with each major genre branching into its associated sub-genres. The depth of this genre tree represents the range and diversity of music styles from the main genre to the most specific sub-genres. To plan the festival lineup, you need to calculate the depth of this tree. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",2,3,4,5,A,Find the depth of the tree,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return 0
+    left_depth = traversal_algorithm(root.left)
+    right_depth = traversal_algorithm(root.right)
+    return max(left_depth, right_depth) + 1
+",Q3_tree_images/question_3_music.png
+3,5,B,"A->[B,C]; B->[D,E]; C->[]; D->[]; E->[];",What is the output of the code below? Briefly explain what the function does. ,A,B,E,D,C,In-order traversal to find the lexicographically maximum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_max = traversal_algorithm(root.left)
+    right_max = traversal_algorithm(root.right)
+    current_max = max(root.key, left_max, right_max)
+    return current_max
+",Q3_tree_images/question_3_normal.png
+3,5,H,"Harry->[Hermione,Ron]; Hermione->[Dobby,Luna]; Ron->[]; Dobby->[]; Luna->[];","You have come across a collection of magical tomes guarded by Harry Potter characters, organized in a binary search tree. To find the most challenging tome, you need to identify the character that appears last lexicographically (alphabetically). You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Harry,Hermione,Luna,Ron,D,In-order traversal to find the lexicographically maximum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_max = traversal_algorithm(root.left)
+    right_max = traversal_algorithm(root.right)
+    current_max = max(root.key, left_max, right_max)
+    return current_max
+",Q3_tree_images/question_3_harry_potter.png
+3,5,recipe,"Lettuce->[Tomato,Cucumber]; Tomato->[Carrot,Onion]; Cucumber->[]; Carrot->[]; Onion->[];","You are categorizing salad ingredients in a systematic tree structure, where each node holds a different ingredient. To label the ingredients properly, you need to find the one that appears last alphabetically among all entries.You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Lettuce,Tomato,Onion,Cucumber,B,In-order traversal to find the lexicographically maximum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_max = traversal_algorithm(root.left)
+    right_max = traversal_algorithm(root.right)
+    current_max = max(root.key, left_max, right_max)
+    return current_max
+",Q3_tree_images/question_3_recipe.png
+3,5,music,"Rock->[Jazz,Classical]; Jazz->[Blues,Funk]; Classical->[]; Blues->[]; Funk->[];","You are curating a vast collection of music genres arranged in a hierarchical tree structure. Among all these genres, you want to find the one that comes last alphabetically. You decide to write a function to solve this problem. What is the output of the function? Briefly explain what the function does.",Rock,Jazz,Funk,Classical,A,In-order traversal to find the lexicographically maximum value,"class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.key = key
+
+def traversal_algorithm(root):
+    if not root:
+        return """"
+    left_max = traversal_algorithm(root.left)
+    right_max = traversal_algorithm(root.right)
+    current_max = max(root.key, left_max, right_max)
+    return current_max
+",Q3_tree_images/question_3_music.png
