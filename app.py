@@ -33,41 +33,6 @@ def user_progress():
         'questions_correct': session.get('questions_correct', 0)
     })
 
-
-import csv
-
-# def load_questions_from_csv(csv_file_path='Q3_questions.csv'):
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
-    
-#     with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
-#         reader = csv.DictReader(csvfile, delimiter='\t')  # Assuming tab-separated values
-#         for row in reader:
-#             cursor.execute('''
-#                 INSERT OR IGNORE INTO questions (
-#                     id, sub_question, theme, tree_dependency, question, 
-#                     option_a, option_b, option_c, option_d, mcq_answer, 
-#                     function, code, tree_image_path
-#                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-#             ''', (
-#                 row['question_no'],
-#                 row['sub_question'],
-#                 row['theme'],
-#                 row['tree_dependency'],
-#                 row['question'],
-#                 row['option_a'],
-#                 row['option_b'],
-#                 row['option_c'],
-#                 row['option_d'],
-#                 row['mcq_answer'],
-#                 row['function'],
-#                 row['code'],
-#                 row['tree_image_path']
-#             ))
-    
-#     conn.commit()
-#     conn.close()
-
 def get_question_by_id(question_id, theme=None):
     conn = sqlite3.connect('questions.db')
     cursor = conn.cursor()
