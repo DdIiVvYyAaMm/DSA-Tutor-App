@@ -2,54 +2,77 @@ import sqlite3
 import csv
 import json
 
-# Connect to the SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect('questions.db')
-cursor = conn.cursor()
+def load_questions_from_csv(csv_file_path='Q3_questions.csv'):
+    conn = sqlite3.connect('questions.db')
+    cursor = conn.cursor()
+    
+    with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=',')  # Assuming comma-separated values
+        for row in reader:
+            cursor.execute('''
+                INSERT INTO questions (
+                    question_no, sub_question, theme, tree_dependency, question, 
+                    option_a, option_b, option_c, option_d, mcq_answer, 
+                    function, code, tree_image_path
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                int(row['question_no']),
+                int(row['sub_question']),
+                row['theme'],
+                row['tree_dependency'],
+                row['question'],
+                row['option_a'],
+                row['option_b'],
+                row['option_c'],
+                row['option_d'],
+                row['mcq_answer'],
+                row['function'],
+                row['code'],
+                row['tree_image_path']
+            ))
+    conn.commit()
+    conn.close()
 
-# Create the questions table if it doesn't exist
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS questions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    question_text TEXT NOT NULL,
-    question_type TEXT NOT NULL,  -- 'mcq' or 'text'
-    options TEXT                  -- JSON-encoded list of options for MCQs
-)
-''')
 
-# Read the questions from the CSV file
-with open('questions.csv', 'r', encoding='utf-8') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        question_text = row['question_text']
-        question_type = row['question_type']
-        options = row['options'] if row['options'] else None
-        
-        # If options are provided for MCQ, ensure they're JSON-encoded
-        if question_type == 'mcq' and options:
-            try:
-                options = json.dumps(json.loads(options))  # Parse and re-encode to ensure valid JSON
-            except json.JSONDecodeError:
-                print(f"Error decoding options for question: {question_text}")
-                options = None
+def init_db():
+    conn = sqlite3.connect('questions.db')
+    cursor = conn.cursor()
+    
+    # Create users table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            questions_attempted INTEGER DEFAULT 0,
+            questions_correct INTEGER DEFAULT 0,
+            correct_ids TEXT,
+            incorrect_ids TEXT
+        )
+    ''')
+    
+    # Create questions table with additional fields
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question_no INTEGER,
+            sub_question INTEGER,
+            theme TEXT,
+            tree_dependency TEXT,
+            question TEXT,
+            option_a TEXT,
+            option_b TEXT,
+            option_c TEXT,
+            option_d TEXT,
+            mcq_answer TEXT,
+            function TEXT,
+            code TEXT,
+            tree_image_path TEXT
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
 
-        # Insert the question into the database
-        cursor.execute('''
-        INSERT INTO questions (question_text, question_type, options) VALUES (?, ?, ?)
-        ''', (question_text, question_type, options))
-
-# Create the users table to track progress
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    username TEXT PRIMARY KEY,
-    questions_attempted INTEGER DEFAULT 0,
-    questions_correct INTEGER DEFAULT 0,
-    correct_ids TEXT,
-    incorrect_ids TEXT
-)
-''')
-
-# Commit changes and close the database connection
-conn.commit()
-conn.close()
-
-print("Questions have been imported successfully from CSV and User Database initialized.")
+if __name__ == '__main__':
+    init_db()
+    load_questions_from_csv('Q3_questions.csv')  # Replace with your CSV path
+    print("Database initialized and questions loaded successfully.")

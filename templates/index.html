@@ -1,3 +1,4 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,17 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSA Tutor App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Optional: Include a Syntax Highlighting Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
 </head>
 <body>
     <div class="container">
         <div id="left-panel">
             <div id="context" class="section">
                 <h2>Context</h2>
-                <p>Information related to the current question will be shown here.</p>
+                <p id="context-text">Information related to the current question will be shown here.</p>
             </div>
             <div id="feedback" class="section">
                 <h3>Feedback</h3>
-                <p>Feedback will appear here after evaluation.</p>
+                <p id="feedback-text">Feedback will appear here after evaluation.</p>
             </div>
         </div>
         <div id="divider">
@@ -29,16 +32,38 @@
             </div>
             <div id="question-area" class="section">
                 <h3>Question Area</h3>
-                <p>The question will appear here.</p>
+                <!-- Theme Selection Dropdown -->
+                <label for="theme-select">Select Theme:</label>
+                <select id="theme-select">
+                    <option value="">Base (B)</option>
+                    <option value="H">Harry Potter (H)</option>
+                    <option value="R">Recipe (R)</option>
+                    <option value="M">Music (M)</option>
+                </select>
+                <!-- Display the current theme -->
+                <p>Current Theme: <span id="current-theme">Base (B)</span></p>
+                
+                <!-- Question Text -->
+                <p id="question-text">The question will appear here.</p>
+                
+                <!-- Code Snippet Container -->
+                <pre><code id="code-snippet" class="language-python">Code will appear here.</code></pre>
+                
+                <!-- Image Container -->
+                <div id="image-container">
+                    <!-- Image will be dynamically inserted here by JavaScript -->
+                </div>
             </div>
             <div id="answer-area" class="section">
-                <textarea id="response" placeholder="Type your response here..."></textarea>
-                <button id="submit" class="button">Submit</button>
-                <button id="next" class="button">Next Question</button>
+                <!-- Answer options or response area will be dynamically injected here by JavaScript -->
             </div>
         </div>
     </div>
-
+    
+    <!-- Optional: Include Highlight.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
