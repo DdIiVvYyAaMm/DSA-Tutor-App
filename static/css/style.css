@@ -1,3 +1,89 @@
+/* Login Page Styles */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+
+.login-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+    color: #333;
+    font-size: 1.75rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #1976D2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 1.5rem;
+    }
+
+    .login-title {
+        font-size: 1.5rem;
+    }
+}
+
 /* Base styles */
 body {
     margin: 0;
@@ -630,6 +716,91 @@ body {
 
     .input-group label {
         margin-bottom: 5px;
+    }
+}
+
+/* Parsons Puzzle specific styles - Updated to hide all unnecessary elements */
+.parsons-mode #left-panel,
+.parsons-mode #divider,
+.parsons-mode .progress-section,
+.parsons-mode .theme-selector,
+.parsons-mode #image-container {
+    display: none !important;
+}
+
+/* Make header simpler in parsons mode */
+.parsons-mode .header-row {
+    padding: 15px;
+    margin-bottom: 0;
+    justify-content: flex-start; /* Align username to left */
+}
+
+/* Ensure right panel takes full width */
+.parsons-mode #right-panel {
+    width: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Make sure parsons container is properly sized */
+.parsons-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+/* Make iframe container fill available space */
+.parsons-iframe {
+    width: 100%;
+    height: calc(100vh - 200px); /* Adjust height to fill available space */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f8f9fa;
+}
+
+/* Loading state adjustments */
+.parsons-loading {
+    width: 100%;
+    height: calc(100vh - 200px); /* Match iframe height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Keep next button at bottom */
+.parsons-mode .button-container {
+    padding: 15px;
+    margin-top: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments for parsons mode */
+@media (max-width: 768px) {
+    .parsons-mode #right-panel {
+        padding: 10px;
+    }
+    
+    .parsons-iframe,
+    .parsons-loading {
+        height: calc(100vh - 150px);
+    }
+    
+    .parsons-container {
+        padding: 10px;
     }
 }
 
