@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
+client = OpenAI(api_key = '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')
 
 QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
