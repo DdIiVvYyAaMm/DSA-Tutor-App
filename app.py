@@ -22,7 +22,7 @@ QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
     'q2': 'mcq_traversal',
     'q3': 'mcq_code',
-    'q4': 'timecomplexity',
+    'q4': 'mcq_traversal',  # Using same as q2
     'q5': 'parsons'
 }
 
@@ -124,13 +124,28 @@ def get_random_question_by_type(question_type, theme):
     """Get random question from database based on type and theme"""
     conn = get_db_connection()
     cursor = conn.cursor()
-    table_name = f"{question_type}_questions"
-    cursor.execute(f"""
-        SELECT * FROM {table_name}
-        WHERE theme = ?
-        ORDER BY RANDOM()
-        LIMIT 1
-    """, (theme,))
+    
+    # Special handling for q4 to use q2_questions table
+
+    if question_type == 'q4':
+        table_name = 'q2_questions'
+    else:
+        table_name = f"{question_type}_questions"
+    
+    # Special handling for parsons puzzles (q5) which don't have theme
+    if question_type == 'q5':
+        cursor.execute(f"""
+            SELECT * FROM {table_name}
+            ORDER BY RANDOM()
+            LIMIT 1
+        """)
+    else:
+        cursor.execute(f"""
+            SELECT * FROM {table_name}
+            WHERE theme = ?
+            ORDER BY RANDOM()
+            LIMIT 1
+        """, (theme,))
     
     question = cursor.fetchone()
     conn.close()
@@ -145,13 +160,23 @@ def format_question_response(question, question_type):
     base_data = {
         'question_no': question['question_no'],
         'sub_question': question['sub_question'],
-        'theme': question['theme'],
-        'tree_image_path': question['tree_image_path'],
-        'tree_dependency': question['tree_dependency'],
         'type': question_type
     }
     
-    if question_type == 'fill_in_blanks':
+    # Add theme and tree dependency only for non-parsons questions
+    if question_type != 'parsons':
+        base_data.update({
+            'theme': question['theme'],
+            'tree_image_path': question['tree_image_path'],
+            'tree_dependency': question['tree_dependency']
+        })
+    
+    if question_type == 'parsons':
+        base_data.update({
+            'question_text': question['question'],
+            'url': question['url']
+        })
+    elif question_type == 'fill_in_blanks':
         base_data.update({
             'root_question': question['root_question'],
             'leaf_question': question['leaf_question'],
@@ -171,7 +196,7 @@ def format_question_response(question, question_type):
         })
     elif question_type == 'mcq_code':
         base_data.update({
-            'question_text': question['question'],  # Note: using 'question' not 'question_text'
+            'question_text': question['question'],
             'options': {
                 'A': question['option_a'],
                 'B': question['option_b'],
@@ -187,7 +212,12 @@ def format_question_response(question, question_type):
 # Answer Evaluation Functions
 def evaluate_answer(question_type, question_no, sub_question, theme, user_response):
     """Evaluate user answer based on question type"""
+    # For parsons puzzles, always return True as evaluation happens on external site
+    
+    if question_type == 'parsons':
+        return True
     return True
+        
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -269,7 +299,7 @@ def get_question():
         is_next = input_data.get('is_next', False)
         # Handle queue building phase
         if is_next and session.get('queue_building', True):
-            if len(session['question_queue']) < 6:
+            if len(session['question_queue']) < 5:
                 next_question = f'q{len(session["question_queue"]) + 1}'
                 if next_question not in session['question_queue']:
                     session['question_queue'].append(next_question)

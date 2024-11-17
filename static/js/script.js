@@ -163,12 +163,23 @@ function updateContext(questionType) {
 }
 
 function displayQuestion(questionData) {
+    // Clear image container first
+    const imageContainer = document.getElementById('image-container');
+    if (imageContainer) {
+        imageContainer.innerHTML = '';
+    }
+
     // Display question text with proper handling for each type
     const questionArea = document.querySelector('.question-container');
     if (questionArea) {
         let questionText = '';
         
-        if (questionData.type === 'fill_in_blanks') {
+        if (questionData.type === 'parsons') {
+            questionText = `
+                <h3>Question ${questionData.question_no}</h3>
+                <p>${questionData.question_text}</p>
+            `;
+        } else if (questionData.type === 'fill_in_blanks') {
             questionText = '<h3>For the given tree, answer the below questions:</h3>';
             questionText += `<p>${questionData.sub_question}</p>`;
         } else if (questionData.type === 'mcq_code') {
@@ -180,9 +191,8 @@ function displayQuestion(questionData) {
         questionArea.innerHTML = questionText;
     }
 
-    // Display tree image if available
-    if (questionData.tree_image_path) {
-        const imageContainer = document.getElementById('image-container');
+    // Display tree image only if available and not a parsons puzzle
+    if (questionData.tree_image_path && questionData.type !== 'parsons') {
         if (imageContainer) {
             imageContainer.innerHTML = `
                 <img src="/static/${questionData.tree_image_path}" 
@@ -203,13 +213,63 @@ function setupAnswerInterface(questionData) {
     // Clear previous content
     answerArea.innerHTML = '';
 
-    if (questionData.type === 'mcq_code') {
-        setupCodeMCQInterface(questionData, answerArea);
-    } else if (questionData.type === 'mcq_traversal') {
-        setupMCQInterface(questionData, answerArea);
-    } else if (questionData.type === 'fill_in_blanks') {
-        setupFillInBlanksInterface(answerArea, questionData);  // Note: now passing questionData
+    // Handle different question types
+    if (questionData.type === 'parsons') {
+        setupParsonsInterface(questionData, answerArea);
+        // Add parsons-mode class to container
+        document.querySelector('.container').classList.add('parsons-mode');
+    } else {
+        // Remove parsons-mode class if it exists
+        document.querySelector('.container').classList.remove('parsons-mode');
+        
+        if (questionData.type === 'mcq_code') {
+            setupCodeMCQInterface(questionData, answerArea);
+        } else if (questionData.type === 'mcq_traversal') {
+            setupMCQInterface(questionData, answerArea);
+        } else if (questionData.type === 'fill_in_blanks') {
+            setupFillInBlanksInterface(answerArea, questionData);
+        }
     }
+}
+
+function setupParsonsInterface(questionData, container) {
+    // Ensure parsons mode is active
+    document.querySelector('.container').classList.add('parsons-mode');
+    
+    // Create parsons container
+    const parsonsContainer = document.createElement('div');
+    parsonsContainer.className = 'parsons-container';
+
+    // Create iframe
+    const iframe = document.createElement('iframe');
+    iframe.className = 'parsons-iframe';
+    iframe.src = questionData.url;
+    iframe.style.display = 'none'; // Hide initially
+
+    // Create loading placeholder
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'parsons-loading';
+
+    // Handle iframe loading
+    iframe.addEventListener('load', () => {
+        loadingDiv.style.display = 'none';
+        iframe.style.display = 'block';
+        iframe.classList.add('loaded');
+    });
+
+    // Handle loading errors
+    iframe.addEventListener('error', () => {
+        loadingDiv.style.display = 'none';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'parsons-error';
+        errorDiv.textContent = 'Failed to load puzzle. Please try refreshing the page.';
+        parsonsContainer.appendChild(errorDiv);
+    });
+
+    // Add elements to container
+    parsonsContainer.appendChild(loadingDiv);
+    parsonsContainer.appendChild(iframe);
+    container.appendChild(parsonsContainer);
 }
 
 function setupCodeMCQInterface(questionData, container) {
@@ -374,6 +434,11 @@ function collectAnswer() {
 }
 
 function submitAnswer() {
+    // If it's a parsons puzzle, we don't need to collect an answer
+    if (currentQuestionType === 'parsons') {
+        nextQuestion();
+        return;
+    }
     const userResponse = collectAnswer();
     
     // Enhanced validation for code questions
@@ -426,11 +491,22 @@ function submitAnswer() {
 
 // Add a clearAnswers function to be used when loading new questions
 function clearAnswers() {
-    // Existing clear logic
+    // Clear all previous states
+    const container = document.querySelector('.container');
+    container.classList.remove('parsons-mode');
+    
+    // Clear image container
+    const imageContainer = document.getElementById('image-container');
+    if (imageContainer) {
+        imageContainer.innerHTML = '';
+    }
+    
+    // Clear MCQ selections
     document.querySelectorAll('.mcq-option').forEach(option => {
         option.classList.remove('selected');
     });
     
+    // Clear comprehension textarea if exists
     const comprehensionTextarea = document.getElementById('code-comprehension');
     if (comprehensionTextarea) {
         comprehensionTextarea.value = '';
@@ -502,6 +578,40 @@ function clearFeedback() {
 }
 
 function nextQuestion() {
+    // For Q5 (parsons puzzles), proceed directly to next question
+    if (currentQuestionType === 'parsons') {
+        clearFeedback();
+        loadQuestion(true);
+        return;
+    }
+
+    // For all other question types, validate answer exists
+    let hasAnswer = false;
+
+    // Check answer based on question type
+    if (currentQuestionType === 'fill_in_blanks') {
+        // Check if at least one input field has a value
+        const inputs = document.querySelectorAll('.answer-input');
+        hasAnswer = Array.from(inputs).some(input => input.value.trim() !== '');
+    } 
+    else if (currentQuestionType === 'mcq_code') {
+        // Check if MCQ is selected and comprehension text exists
+        const selectedOption = document.querySelector('.mcq-option.selected');
+        const comprehensionText = document.getElementById('code-comprehension')?.value.trim();
+        hasAnswer = selectedOption && comprehensionText;
+    }
+    else {
+        // For regular MCQ questions
+        const selectedOption = document.querySelector('.mcq-option.selected');
+        hasAnswer = !!selectedOption;
+    }
+
+    if (!hasAnswer) {
+        alert('Please submit an answer before moving to the next question.');
+        return;
+    }
+
+    // If we have an answer, proceed to next question
     clearFeedback();
     loadQuestion(true);
 }
