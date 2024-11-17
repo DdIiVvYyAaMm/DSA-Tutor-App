@@ -107,7 +107,7 @@ def init_db():
             question_no INTEGER,
             sub_question INTEGER,
             theme TEXT,
-            question TEXT,
+            question_text TEXT,
             option_1 TEXT,
             option_2 TEXT,
             option_3 TEXT,

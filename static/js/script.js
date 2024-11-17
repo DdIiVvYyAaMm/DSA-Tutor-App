@@ -184,7 +184,10 @@ function displayQuestion(questionData) {
             questionText += `<p>${questionData.sub_question}</p>`;
         } else if (questionData.type === 'mcq_code') {
             questionText = `<h3>${questionData.question_text}</h3>`;
-        } else {
+        } else if (questionData.type === 'time_complexity') {
+            questionText = `<h3>${questionData.question_text}</h3>`;  
+        } 
+        else {
             questionText = `<h3>${questionData.question_text || questionData.sub_question}</h3>`;
         }
         
@@ -224,7 +227,7 @@ function setupAnswerInterface(questionData) {
         
         if (questionData.type === 'mcq_code') {
             setupCodeMCQInterface(questionData, answerArea);
-        } else if (questionData.type === 'mcq_traversal') {
+        } else if (questionData.type === 'mcq_traversal' || questionData.type === 'time_complexity') {
             setupMCQInterface(questionData, answerArea);
         } else if (questionData.type === 'fill_in_blanks') {
             setupFillInBlanksInterface(answerArea, questionData);

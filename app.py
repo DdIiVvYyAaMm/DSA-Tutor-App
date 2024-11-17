@@ -21,7 +21,7 @@ QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
     'q2': 'mcq_traversal',
     'q3': 'mcq_code',
-    'q4': 'mcq_traversal',  # Using same as q2
+    'q4': 'time_complexity',
     'q5': 'parsons'
 }
 
@@ -57,7 +57,7 @@ Common operations:
 - Deletion: Removing nodes
 - Search: Finding specific nodes
     """,
-    'timecomplexity':"""
+    'time_complexity':"""
 blahblahblah
 """,
 'parsons':"""
@@ -126,13 +126,13 @@ def get_random_question_by_type(question_type, theme):
     
     # Special handling for q4 to use q2_questions table
 
-    if question_type == 'q4':
-        table_name = 'q2_questions'
-    else:
-        table_name = f"{question_type}_questions"
+    # if question_type == 'q4':
+    #     table_name = 'q2_questions'
+    # else:
+    table_name = f"{question_type}_questions"
     
     # Special handling for parsons puzzles (q5) which don't have theme
-    if question_type == 'q5':
+    if question_type in ['q5', 'q4']:
         cursor.execute(f"""
             SELECT * FROM {table_name}
             ORDER BY RANDOM()
@@ -163,7 +163,7 @@ def format_question_response(question, question_type):
     }
     
     # Add theme and tree dependency only for non-parsons questions
-    if question_type != 'parsons':
+    if question_type not in ['parsons', 'time_complexity']:
         base_data.update({
             'theme': question['theme'],
             'tree_image_path': question['tree_image_path'],
@@ -204,6 +204,17 @@ def format_question_response(question, question_type):
             },
             'function': question['function'],
             'code': question['code']
+        })
+    elif question_type == 'time_complexity':
+        base_data.update({
+            'question_text': question['question_text'],
+            'options': {
+                'A': question['option_1'],
+                'B': question['option_2'],
+                'C': question['option_3'],
+                'D': question['option_4']
+            },
+            'code': question['code']  # Assuming time_complexity questions include code
         })
     
     return base_data
