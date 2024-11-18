@@ -1,2 +1,6 @@
 question_no,sub_question,question,url
 5,1,You are asked to implement a function that counts the number of leaf nodes in a binary tree.,https://parsons.problemsolving.io/puzzle/0e321d089fed43299ea70cefee38d21a
+5,2,You are asked to implement a function that calculates the depth of a binary tree.,https://parsons.problemsolving.io/puzzle/ab2b8c7e411f48c08a074661c5300264
+5,3,You are asked to write a function to check if a binary tree is symmetric around its center. ,https://parsons.problemsolving.io/puzzle/086e5ef5301b4b9aa5970f959ebd92ac
+5,4,You are asked to create a function that verifies if a given binary tree is a valid binary search tree.,https://parsons.problemsolving.io/puzzle/fc0fe93f12664e6cbf9d4a7384e493b9
+5,5,You are asked to write a function that efficiently counts the number of nodes in a complete binary tree.,https://parsons.problemsolving.io/puzzle/690fd5f5b4344b7882a9832ce2b92160
