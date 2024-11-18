@@ -5,6 +5,7 @@ let currentQuestionNo = '';
 let currentSubQuestion = '';
 let currentTheme = 'B';
 let currentCode = '';
+let currentQuestionData = null;
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -97,6 +98,9 @@ function loadQuestion(isNext) {
             handleError(data.error);
             return;
         }
+
+        // Store the current question data in the global variable
+        currentQuestionData = data;
         
         currentQuestionType = data.type;
         currentQuestionNo = data.question_no;
@@ -113,6 +117,10 @@ function loadQuestion(isNext) {
         console.error('Error loading question:', error);
         handleError('Failed to load question. Please try again.');
     });
+}
+
+function getCurrentQuestionData() {
+    return currentQuestionData;
 }
 
 function updateContext(questionType) {
@@ -181,7 +189,7 @@ function displayQuestion(questionData) {
             `;
         } else if (questionData.type === 'fill_in_blanks') {
             questionText = '<h3>For the given tree, answer the below questions:</h3>';
-            questionText += `<p>${questionData.sub_question}</p>`;
+            // questionText += `<p>${questionData.sub_question}</p>`;
         } else if (questionData.type === 'mcq_code') {
             questionText = `<h3>${questionData.question_text}</h3>`;
         } else if (questionData.type === 'time_complexity') {
@@ -344,28 +352,29 @@ function setupFillInBlanksInterface(container, questionData) {
 
     // Define the questions and their corresponding input IDs
     const questions = [
-        { text: questionData.root_question, id: 'root-answer' },
-        { text: questionData.leaf_question, id: 'leaf-answer' },
-        { text: questionData.depth_question, id: 'depth-answer' },
-        { text: questionData.child_question, id: 'child-answer' },
-        { text: questionData.parent_question, id: 'parent-answer' }
+        { text: questionData.root_question, inputId: 'root-question-answer' },
+        { text: questionData.leaf_question, inputId: 'leaf-question-answer' },
+        { text: questionData.depth_question, inputId: 'depth-question-answer' },
+        { text: questionData.child_question, inputId: 'child-question-answer' },
+        { text: questionData.parent_question, inputId: 'parent-question-answer' }
     ];
 
     // Create input groups for each question
     questions.forEach(question => {
         const inputGroup = document.createElement('div');
         inputGroup.className = 'input-group';
-        
+
         // Create and add the question text
         const questionLabel = document.createElement('label');
-        questionLabel.htmlFor = question.id;
+        questionLabel.htmlFor = question.inputId;
+        questionLabel.id = `${question.inputId}-label`; // Add ID to the label
         questionLabel.textContent = question.text;
         questionLabel.className = 'question-label';
         
-        // Create and add the input field
+        // Create and add the input field for the user's response
         const input = document.createElement('input');
         input.type = 'text';
-        input.id = question.id;
+        input.id = question.inputId;
         input.className = 'answer-input';
         
         // Add elements to the input group
@@ -380,24 +389,35 @@ function setupFillInBlanksInterface(container, questionData) {
 }
 
 function setupMCQInterface(questionData, container) {
-    const mcqTemplate = document.getElementById('mcq-template');
-    const clone = mcqTemplate.content.cloneNode(true);
-    const optionsContainer = clone.querySelector('.options-container');
+    // Add code display first
+    const codeDiv = document.createElement('div');
+    codeDiv.className = 'code-display';
+    codeDiv.innerHTML = `
+        <pre><code class="language-python">${questionData.code}</code></pre>
+    `;
+    container.appendChild(codeDiv);
     
-    setupMCQOptions(questionData, optionsContainer);
-    container.appendChild(clone);
-}
+    // Initialize syntax highlighting
+    if (window.Prism) {
+        Prism.highlightElement(container.querySelector('code'));
+    }
 
-function setupMCQOptions(questionData, container) {
-    const options = Object.entries(questionData.options).map(([key, text]) => ({ key, text }));
-
-    options.forEach(option => {
+    // Add MCQ options
+    const mcqDiv = document.createElement('div');
+    mcqDiv.className = 'mcq-container';
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'options-container';
+    
+    Object.entries(questionData.options).forEach(([key, text]) => {
         const button = document.createElement('button');
         button.className = 'mcq-option';
-        button.textContent = `${option.key}. ${option.text}`;
+        button.textContent = `${key}. ${text}`;
         button.addEventListener('click', () => selectMCQOption(button));
-        container.appendChild(button);
+        optionsContainer.appendChild(button);
     });
+
+    mcqDiv.appendChild(optionsContainer);
+    container.appendChild(mcqDiv);
 }
 
 function selectMCQOption(selectedButton) {
@@ -414,7 +434,7 @@ function collectAnswer() {
     if (currentQuestionType === 'fill_in_blanks') {
         const answers = {};
         ['root', 'leaf', 'depth', 'child', 'parent'].forEach(type => {
-            const input = document.getElementById(`${type}-answer`);
+            const input = document.getElementById(`${type}-question-answer`);
             answers[type] = input ? input.value.trim() : '';
         });
         return answers;
@@ -443,7 +463,7 @@ function submitAnswer() {
         return;
     }
     const userResponse = collectAnswer();
-    
+
     // Enhanced validation for code questions
     if (!userResponse) {
         if (currentQuestionType === 'mcq_code') {
@@ -454,9 +474,39 @@ function submitAnswer() {
         return;
     }
 
-    // Get question text for feedback
+    // Get question text for feedback along with fill in the blanks labels
     const questionContainer = document.querySelector('.question-container');
-    const questionText = questionContainer ? questionContainer.textContent : '';
+    let questionText = questionContainer ? questionContainer.textContent : '';
+
+    if (currentQuestionType === 'fill_in_blanks') {
+        const labels = ['root', 'leaf', 'depth', 'child', 'parent']
+            .map(type => document.querySelector(`#${type}-question-answer-label`))
+            .filter(label => label)
+            .map(label => label.textContent)
+            .join('\n');
+        questionText += `\n${labels}`;
+    } else if (['mcq_code', 'mcq_traversal', 'time_complexity'].includes(currentQuestionType)) {
+        // Collect MCQ options from the questionData
+        const questionData = getCurrentQuestionData(); // Implement a function to return the current question data
+        if (questionData && questionData.options) {
+            const optionsText = Object.entries(questionData.options)
+                .map(([key, text]) => `${key}: ${text}`)
+                .join('\n');
+            questionText += `\nOptions:\n${optionsText}`;
+        }
+    }
+
+    // Prepare request data
+    let requestData = {
+        type: currentQuestionType,
+        question_no: currentQuestionNo,
+        sub_question: currentSubQuestion,
+        theme: currentTheme,
+        user_response: userResponse,
+        question_text: questionText,
+        code: currentCode,
+        tree_dependency: currentTreeDependency
+    };
 
     // Submit answer
     fetch('/evaluate', {
@@ -464,16 +514,7 @@ function submitAnswer() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            type: currentQuestionType,
-            question_no: currentQuestionNo,
-            sub_question: currentSubQuestion,
-            theme: currentTheme,
-            user_response: userResponse,
-            question_text: questionText,
-            code: currentCode,
-            tree_dependency: currentTreeDependency
-        }),
+        body: JSON.stringify(requestData),
     })
     .then(response => {
         if (!response.ok) {

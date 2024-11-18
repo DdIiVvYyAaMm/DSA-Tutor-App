@@ -1,5 +1,5 @@
 question_no,sub_question,theme,question,option_1,option_2,option_3,option_4,mcq_answer,code
-4,1,B,"This function searches for a specific element (key) in a binary tree. It returns the node containing the key if found, otherwise it returns None. What is the time complexity of this algorithm?",O(1),O(log n),O(n),O(n^2),C,"class Node:
+4,1,C,"This function searches for a specific element (key) in a binary tree. It returns the node containing the key if found, otherwise it returns None. What is the time complexity of this algorithm?",O(1),O(log n),O(n),O(n^2),C,"class Node:
     def __init__(self, key):
         self.left = None
         self.right = None
@@ -12,7 +12,7 @@ def search(root, key):
         return traversal_algorithm(root.right, key)
     return traversal_algorithm(root.left, key)
 "
-4,2,B,"This function performs an inorder (left, root, right) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(n),O(log n),O(n^2),O(1),A,"class Node:
+4,2,A,"This function performs an inorder (left, root, right) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(n),O(log n),O(n^2),O(1),A,"class Node:
     def __init__(self, key):
         self.left = None
         self.right = None
@@ -42,7 +42,7 @@ def insert(root, key):
         root.right = traversal_algorithm(root.right, key)
     return root
 "
-4,4,B,"This function performs a preorder (root, left, right) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(n),O(log n),O(n^2),O(1),A,"class Node:
+4,4,A,"This function performs a preorder (root, left, right) traversal of a binary tree. It returns a list of the values in the nodes visited during the traversal. What is the time complexity of this algorithm?",O(n),O(log n),O(n^2),O(1),A,"class Node:
     def __init__(self, key):
         self.left = None
         self.right = None

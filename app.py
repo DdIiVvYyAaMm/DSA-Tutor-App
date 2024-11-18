@@ -226,7 +226,6 @@ def evaluate_answer(question_type, question_no, sub_question, theme, user_respon
     
     if question_type == 'parsons':
         return True
-    return True
         
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -238,9 +237,16 @@ def evaluate_answer(question_type, question_no, sub_question, theme, user_respon
             WHERE question_no = ? AND sub_question = ? AND theme = ?
         """, (question_no, sub_question, theme))
         answers = cursor.fetchone()
-        correct = any(user_response == answer for answer in answers)
+        correct = any(answer == response for answer, response in zip(answers, user_response.values()))
+
     else:
-        table_name = 'q2_questions' if question_type == 'mcq_traversal' else 'q3_questions'
+        table_name = ''
+        if question_type == 'mcq_traversal':
+            table_name = 'q2_questions'
+        elif question_type == 'mcq_code':
+            table_name = 'q3_questions'
+        elif question_type == 'time_complexity':
+            table_name = 'q4_questions'
         answer_column = 'correct_answer' if question_type == 'mcq_traversal' else 'mcq_answer'
         
         cursor.execute(f"""
@@ -248,11 +254,14 @@ def evaluate_answer(question_type, question_no, sub_question, theme, user_respon
             FROM {table_name}
             WHERE question_no = ? AND sub_question = ? AND theme = ?
         """, (question_no, sub_question, theme))
-        answer = cursor.fetchone()
-        correct = user_response == answer[0]
+        answers = [cursor.fetchone()]
+        print("answers:", answers)
+        correct = user_response == answers[0][0]
     
     conn.close()
-    return correct
+
+    # Returns whether the given answer is correct as well as the correct answer(s)
+    return (correct, answers)
 
 # Route Handlers
 @app.route('/')
@@ -366,13 +375,21 @@ def evaluate():
     code = data.get('code', '')
     tree_dependency = data.get('tree_dependency')
 
+
+    print("question_text:", question_text)
+    print("code:", code)
+    print("tree_dependency:", tree_dependency)
+    print("user_response:", user_response)
+
+
+
     # Extract MCQ and comprehension responses for code questions
     if question_type == 'mcq_code':
         mcq_answer = user_response.get('mcq')
         comprehension = user_response.get('comprehension', '')
         
         # First evaluate MCQ answer
-        correct = evaluate_answer(
+        correct, answers = evaluate_answer(
             question_type,
             question_no,
             sub_question,
@@ -381,7 +398,7 @@ def evaluate():
         )
     else:
         # Handle other question types normally
-        correct = evaluate_answer(
+        correct, answers = evaluate_answer(
             question_type,
             question_no,
             sub_question,
@@ -394,33 +411,57 @@ def evaluate():
         q_type = f'q{question_no}_correct'
         session[q_type] = session.get(q_type, 0) + 1
         update_queue_state(f'q{question_no}')
+
+    # Gets the correct answer(s) for the question
+    if question_type == "fill_in_blanks":
+        answers = [answer for answer in answers]
+    else:
+        answers = [answer[0] for answer in answers]
     
     # Prepare GPT prompt based on question type
     if question_type == 'mcq_code':
-        prompt = f"""Evaluate the student's understanding of the following code question:
-
-Question: {question_text}
-
-Code:
-{code}
-
-Student's MCQ Answer: {mcq_answer}
-
-Student's Code Comprehension:
-{comprehension}
-
-Provide specific feedback on:
-1. The correctness of their MCQ choice
-2. Their understanding of the code based on their written explanation
-Keep the feedback concise but informative."""
+        prompt = f"""The student was asked a multiple choice question and a comprehension question.
+			         The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
+                     The Python code provided to the student is as follows:\n{code}\n. 
+                     The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
+			         To the multiple choice question, the student answered:{mcq_answer}.
+                     To the comprehension question, the student answered: “{comprehension}”.
+                     This is the correct answer to the multiple choice:{answers}.
+			         Provide specific feedback for both their multiple choice answer and their comprehension answer.
+                     If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
+                     If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
+                     Address the student directly in the output.
+                     Be very lenient when evaluating the student's response for correctness.
+                     Be mildly encouraging in your response."""
+    elif question_type == "fill_in_blanks":
+        prompt = f"""DO NOT EVALUATE ANY FORMAT DISCREPANCIES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER.
+                     The question that was asked to the student is as follows: "{question_text} . Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
+                     The Python code provided to the student is as follows:\n{code}\n. 
+                     The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
+                     These are the student's responses to the posed subquestions: "{user_response}". Please disregard the formatting of the student's answer.
+                     These are the correct answers for each subquestion:{answers}.
+                     Be extremely lenient when evaluating the student's response for correctness.
+                     If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
+                     If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
+                     **IMPORTANT**: Ignore any spacing differences, differences in commas, or differences in the order of nodes between the student's response and the correct answer.
+                     Address the student directly in the output.
+                     Be mildly encouraging in your response."""
     else:
-        prompt = f"Question: {question_text}\nCode: {code}\nTree Dependency: {tree_dependency}\nUser Response: {user_response}\nProvide concise feedback on the correctness and quality of the response."
+        prompt = f"""The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
+                     The Python code provided to the student is as follows:\n{code}\n. 
+                     The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
+                     This is the student's multiple choice option selection: "{user_response}".
+                     This is the correct multiple choice option:{answers}.
+                     If the student has selected the correct multiple choice option, the only output should be congratulating the student and letting them know they answered the question correctly.
+                     If the student has selected an incorrect multiple choice option, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
+                     Address the student directly in the output.
+                     Be mildly encouraging in your response."""
 
     # Get GPT feedback
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are an assistant providing feedback on student comprehension responses."},
+            {"role": "system", "content": "You are an assistant providing feedback on a student's answer to a question related to binary trees."},
             {"role": "user", "content": prompt}
         ],
         max_tokens=150,
