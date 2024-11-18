@@ -234,11 +234,11 @@ function setupAnswerInterface(questionData) {
         document.querySelector('.container').classList.remove('parsons-mode');
         
         if (questionData.type === 'mcq_code') {
-            setupCodeMCQInterface(questionData, answerArea);
+            setupCodeMCQInterface(questionData, answerArea, true); // Include comprehension
         } else if (questionData.type === 'mcq_traversal'){
             setupMCQInterface(questionData, answerArea);
         } else if (questionData.type === 'time_complexity') {
-            setupCodeMCQInterface(questionData, answerArea);
+            setupCodeMCQInterface(questionData, answerArea, false); // Don't include comprehension
         } else if (questionData.type === 'fill_in_blanks') {
             setupFillInBlanksInterface(answerArea, questionData);
         }
@@ -285,7 +285,7 @@ function setupParsonsInterface(questionData, container) {
     container.appendChild(parsonsContainer);
 }
 
-function setupCodeMCQInterface(questionData, container) {
+function setupCodeMCQInterface(questionData, container, includeComprehension = true) {
     // Add code display first
     const codeDiv = document.createElement('div');
     codeDiv.className = 'code-display';
@@ -316,35 +316,37 @@ function setupCodeMCQInterface(questionData, container) {
     mcqDiv.appendChild(optionsContainer);
     container.appendChild(mcqDiv);
 
-    // Add comprehension section
-    const comprehensionDiv = document.createElement('div');
-    comprehensionDiv.className = 'comprehension-container';
-    
-    comprehensionDiv.innerHTML = `
-        <div class="comprehension-title">
-            Explain your understanding of this code and how it works:
-        </div>
-        <textarea 
-            class="comprehension-textarea" 
-            id="code-comprehension"
-            placeholder="Write your explanation here..."
-            maxlength="500"
-        ></textarea>
-        <div class="char-count">
-            <span id="char-count">0</span>/500 characters
-        </div>
-    `;
-    
-    container.appendChild(comprehensionDiv);
+    // Add comprehension section only if includeComprehension is true
+    if (includeComprehension) {
+        const comprehensionDiv = document.createElement('div');
+        comprehensionDiv.className = 'comprehension-container';
+        
+        comprehensionDiv.innerHTML = `
+            <div class="comprehension-title">
+                Explain your understanding of this code and how it works:
+            </div>
+            <textarea 
+                class="comprehension-textarea" 
+                id="code-comprehension"
+                placeholder="Write your explanation here..."
+                maxlength="500"
+            ></textarea>
+            <div class="char-count">
+                <span id="char-count">0</span>/500 characters
+            </div>
+        `;
+        
+        container.appendChild(comprehensionDiv);
 
-    // Add character count listener
-    const textarea = comprehensionDiv.querySelector('textarea');
-    const charCount = comprehensionDiv.querySelector('#char-count');
-    
-    textarea.addEventListener('input', () => {
-        const count = textarea.value.length;
-        charCount.textContent = count;
-    });
+        // Add character count listener
+        const textarea = comprehensionDiv.querySelector('textarea');
+        const charCount = comprehensionDiv.querySelector('#char-count');
+        
+        textarea.addEventListener('input', () => {
+            const count = textarea.value.length;
+            charCount.textContent = count;
+        });
+    }
 }
 
 function setupFillInBlanksInterface(container, questionData) {
@@ -441,6 +443,9 @@ function collectAnswer() {
             mcq: selectedOption.textContent[0], // First character (A, B, C, or D)
             comprehension: comprehensionText
         };
+    } else if (currentQuestionType === 'time_complexity') {
+        const selectedOption = document.querySelector('.mcq-option.selected');
+        return selectedOption ? selectedOption.textContent[0] : null;
     } else {
         const selectedOption = document.querySelector('.mcq-option.selected');
         return selectedOption ? selectedOption.textContent[0] : null;
@@ -448,6 +453,12 @@ function collectAnswer() {
 }
 
 function submitAnswer() {
+    const queueStatus = JSON.parse(sessionStorage.getItem('progress'));
+    const isComplete = queueStatus && queueStatus.is_complete;
+    
+    if (isComplete) {
+        return; // Don't allow submission if complete
+    }
     // If it's a parsons puzzle, we don't need to collect an answer
     if (currentQuestionType === 'parsons') {
         nextQuestion();
@@ -575,11 +586,25 @@ function updateTheme(theme) {
     });
 }
 
+// Modify the existing updateQueueStatus function
 function updateQueueStatus(queueStatus) {
     if (!queueStatus) return;
     
     sessionStorage.setItem('progress', JSON.stringify(queueStatus.progress));
     updateProgressBar();
+    
+    // Check if queue is complete
+    if (queueStatus.is_complete) {
+        redirectToStats();
+    }
+}
+
+// Add this new function
+function redirectToStats() {
+    // Add a small delay to allow the last feedback to be shown
+    setTimeout(() => {
+        window.location.href = '/stats';
+    }, 1500); // 1.5 second delay
 }
 
 function updateProgressBar(currentQuestionNo) {
@@ -613,6 +638,13 @@ function clearFeedback() {
 }
 
 function nextQuestion() {
+    const queueStatus = JSON.parse(sessionStorage.getItem('progress'));
+    const isComplete = queueStatus && queueStatus.is_complete;
+    
+    if (isComplete) {
+        return; // Don't allow next question if complete
+    }
+
     // For Q5 (parsons puzzles), proceed directly to next question
     if (currentQuestionType === 'parsons') {
         clearFeedback();
@@ -620,7 +652,7 @@ function nextQuestion() {
         return;
     }
 
-    // For all other question types, validate answer exists
+    // Rest of the existing nextQuestion function remains the same
     let hasAnswer = false;
 
     // Check answer based on question type

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Performance Stats</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="stats-page">
+    <div class="stats-container">
+        <div class="stats-header">
+            <h1>Congratulations, {{ username }}! 🎉</h1>
+            <p>You've completed all the questions. Here's how you did:</p>
+        </div>
+
+        <div class="stats-content">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Question Type</th>
+                        <th>Attempts</th>
+                        <th>Correct</th>
+                        <th>Success Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Fill in the Blanks</td>
+                        <td>{{ stats.q1_attempts }}</td>
+                        <td>{{ stats.q1_correct }}</td>
+                        <td>{{ stats.q1_rate }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Tree Traversals</td>
+                        <td>{{ stats.q2_attempts }}</td>
+                        <td>{{ stats.q2_correct }}</td>
+                        <td>{{ stats.q2_rate }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Code Understanding</td>
+                        <td>{{ stats.q3_attempts }}</td>
+                        <td>{{ stats.q3_correct }}</td>
+                        <td>{{ stats.q3_rate }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Time Complexity</td>
+                        <td>{{ stats.q4_attempts }}</td>
+                        <td>{{ stats.q4_correct }}</td>
+                        <td>{{ stats.q4_rate }}%</td>
+                    </tr>
+                    <!-- <tr>
+                        <td>Parsons Puzzles</td>
+                        <td>{{ stats.q5_attempts }}</td>
+                        <td>{{ stats.q5_correct }}</td>
+                        <td>{{ stats.q5_rate }}%</td>
+                    </tr> -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Overall</strong></td>
+                        <td><strong>{{ stats.total_attempts }}</strong></td>
+                        <td><strong>{{ stats.total_correct }}</strong></td>
+                        <td><strong>{{ stats.total_rate }}%</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="stats-actions">
+            <a href="{{ url_for('logout') }}" class="stats-button try-again">Try Again</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
+
 QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
     'q2': 'mcq_traversal',
@@ -80,13 +81,26 @@ def login_required(f):
 
 def initialize_user_queue():
     """Initialize user session with first question and required tracking variables"""
+    if 'username' in session:
+        # Create/update user in database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT OR REPLACE INTO users (
+                username, current_question, 
+                q1_attempts, q1_correct,
+                q2_attempts, q2_correct,
+                q3_attempts, q3_correct,
+                q4_attempts, q4_correct,
+                q5_attempts, q5_correct,
+                current_theme
+            ) VALUES (?, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'B')
+        """, (session['username'],))
+        conn.commit()
+        conn.close()
+
     if 'question_queue' not in session:
-        session['question_queue'] = ['q1']  # Start with only Q1
-        session['q1_correct'] = 0
-        session['q2_correct'] = 0
-        session['q3_correct'] = 0
-        session['q4_correct'] = 0
-        session['q5_correct'] = 0
+        session['question_queue'] = ['q1']
         session['current_theme'] = 'B'
         session['current_question'] = 'q1'
         session['queue_building'] = True
@@ -375,13 +389,20 @@ def evaluate():
     code = data.get('code', '')
     tree_dependency = data.get('tree_dependency')
 
+    # print("question_text:", question_text)
+    # print("code:", code)
+    # print("tree_dependency:", tree_dependency)
+    # print("user_response:", user_response)
 
-    print("question_text:", question_text)
-    print("code:", code)
-    print("tree_dependency:", tree_dependency)
-    print("user_response:", user_response)
-
-
+    # Update attempts in database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(f"""
+        UPDATE users 
+        SET q{question_no}_attempts = q{question_no}_attempts + 1 
+        WHERE username = ?
+    """, (session['username'],))
+    conn.commit()
 
     # Extract MCQ and comprehension responses for code questions
     if question_type == 'mcq_code':
@@ -408,6 +429,13 @@ def evaluate():
 
     # Update progress if correct
     if correct:
+        cursor.execute(f"""
+            UPDATE users 
+            SET q{question_no}_correct = q{question_no}_correct + 1 
+            WHERE username = ?
+        """, (session['username'],))
+        conn.commit()
+        
         q_type = f'q{question_no}_correct'
         session[q_type] = session.get(q_type, 0) + 1
         update_queue_state(f'q{question_no}')
@@ -425,7 +453,7 @@ def evaluate():
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
 			         To the multiple choice question, the student answered:{mcq_answer}.
-                     To the comprehension question, the student answered: “{comprehension}”.
+                     To the comprehension question, the student answered: "{comprehension}".
                      This is the correct answer to the multiple choice:{answers}.
 			         Provide specific feedback for both their multiple choice answer and their comprehension answer.
                      If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
@@ -469,7 +497,13 @@ def evaluate():
     )
     
     feedback = response.choices[0].message.content.strip()
+    conn.close()
 
+    is_complete = len(session['question_queue']) <= 1 and not session.get('queue_building', True)
+    print(is_complete)
+
+    # Check if queue is empty and building phase is complete
+    #is_complete = len(session['question_queue']) == 0 and not session.get('queue_building', True)
     
     return jsonify({
         'correct': correct,
@@ -480,9 +514,68 @@ def evaluate():
             'current_question': session['current_question'],
             'progress': {
                 f'q{i}': session.get(f'q{i}_correct', 0) for i in range(1, 6)
-            }
+            },
+            'is_complete': is_complete
         }
     })
+
+@app.route('/stats')
+@login_required
+def stats():
+    # Get user stats from database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 
+            q1_attempts, q1_correct,
+            q2_attempts, q2_correct,
+            q3_attempts, q3_correct,
+            q4_attempts, q4_correct,
+            q5_attempts, q5_correct
+        FROM users 
+        WHERE username = ?
+    """, (session['username'],))
+    
+    user_stats = cursor.fetchone()
+    conn.close()
+    
+    if not user_stats:
+        return redirect(url_for('index'))
+    
+    # Calculate statistics
+    stats = {
+        'q1_attempts': user_stats[0],
+        'q1_correct': user_stats[1],
+        'q1_rate': round((user_stats[1] / user_stats[0] * 100) if user_stats[0] > 0 else 0, 1),
+        
+        'q2_attempts': user_stats[2],
+        'q2_correct': user_stats[3],
+        'q2_rate': round((user_stats[3] / user_stats[2] * 100) if user_stats[2] > 0 else 0, 1),
+        
+        'q3_attempts': user_stats[4],
+        'q3_correct': user_stats[5],
+        'q3_rate': round((user_stats[5] / user_stats[4] * 100) if user_stats[4] > 0 else 0, 1),
+        
+        'q4_attempts': user_stats[6],
+        'q4_correct': user_stats[7],
+        'q4_rate': round((user_stats[7] / user_stats[6] * 100) if user_stats[6] > 0 else 0, 1),
+        
+        'q5_attempts': user_stats[8],
+        'q5_correct': user_stats[9],
+        'q5_rate': round((user_stats[9] / user_stats[8] * 100) if user_stats[8] > 0 else 0, 1),
+    }
+    
+    # Calculate totals
+    total_attempts = sum(user_stats[i] for i in range(0, 10, 2))
+    total_correct = sum(user_stats[i] for i in range(1, 10, 2))
+    
+    stats.update({
+        'total_attempts': total_attempts,
+        'total_correct': total_correct,
+        'total_rate': round((total_correct / total_attempts * 100) if total_attempts > 0 else 0, 1)
+    })
+    
+    return render_template('stats.html', username=session['username'], stats=stats)
 
 @app.route('/update_theme', methods=['POST'])
 @login_required
