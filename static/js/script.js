@@ -235,8 +235,10 @@ function setupAnswerInterface(questionData) {
         
         if (questionData.type === 'mcq_code') {
             setupCodeMCQInterface(questionData, answerArea);
-        } else if (questionData.type === 'mcq_traversal' || questionData.type === 'time_complexity') {
+        } else if (questionData.type === 'mcq_traversal'){
             setupMCQInterface(questionData, answerArea);
+        } else if (questionData.type === 'time_complexity') {
+            setupCodeMCQInterface(questionData, answerArea);
         } else if (questionData.type === 'fill_in_blanks') {
             setupFillInBlanksInterface(answerArea, questionData);
         }
@@ -389,35 +391,24 @@ function setupFillInBlanksInterface(container, questionData) {
 }
 
 function setupMCQInterface(questionData, container) {
-    // Add code display first
-    const codeDiv = document.createElement('div');
-    codeDiv.className = 'code-display';
-    codeDiv.innerHTML = `
-        <pre><code class="language-python">${questionData.code}</code></pre>
-    `;
-    container.appendChild(codeDiv);
+    const mcqTemplate = document.getElementById('mcq-template');
+    const clone = mcqTemplate.content.cloneNode(true);
+    const optionsContainer = clone.querySelector('.options-container');
     
-    // Initialize syntax highlighting
-    if (window.Prism) {
-        Prism.highlightElement(container.querySelector('code'));
-    }
+    setupMCQOptions(questionData, optionsContainer);
+    container.appendChild(clone);
+}
 
-    // Add MCQ options
-    const mcqDiv = document.createElement('div');
-    mcqDiv.className = 'mcq-container';
-    const optionsContainer = document.createElement('div');
-    optionsContainer.className = 'options-container';
-    
-    Object.entries(questionData.options).forEach(([key, text]) => {
+function setupMCQOptions(questionData, container) {
+    const options = Object.entries(questionData.options).map(([key, text]) => ({ key, text }));
+
+    options.forEach(option => {
         const button = document.createElement('button');
         button.className = 'mcq-option';
-        button.textContent = `${key}. ${text}`;
+        button.textContent = `${option.key}. ${option.text}`;
         button.addEventListener('click', () => selectMCQOption(button));
-        optionsContainer.appendChild(button);
+        container.appendChild(button);
     });
-
-    mcqDiv.appendChild(optionsContainer);
-    container.appendChild(mcqDiv);
 }
 
 function selectMCQOption(selectedButton) {
