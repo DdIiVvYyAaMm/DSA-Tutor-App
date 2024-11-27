@@ -98,6 +98,9 @@ function loadQuestion(isNext) {
             handleError(data.error);
             return;
         }
+        
+        console.log('Received question data:', data); // Debugging line
+
 
         // Store the current question data in the global variable
         currentQuestionData = data;
@@ -107,7 +110,7 @@ function loadQuestion(isNext) {
         currentSubQuestion = data.sub_question;
         currentTreeDependency = data.tree_dependency || '';
         currentCode = data.code || '';
-        
+
         displayQuestion(data);
         updateContext(data.type); // Add this line to update context
         clearFeedback();
@@ -172,6 +175,8 @@ function updateContext(questionType) {
 
 function displayQuestion(questionData) {
     // Clear image container first
+    console.log('Displaying question:', questionData); // Debugging line
+
     const imageContainer = document.getElementById('image-container');
     if (imageContainer) {
         imageContainer.innerHTML = '';

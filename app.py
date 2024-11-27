@@ -17,7 +17,6 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-
 QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
     'q2': 'mcq_traversal',
@@ -448,7 +447,9 @@ def evaluate():
     
     # Prepare GPT prompt based on question type
     if question_type == 'mcq_code':
-        prompt = f"""The student was asked a multiple choice question and a comprehension question.
+        prompt = f"""**IMPORTANT: BE VERY LENIENT WHEN EVALUATING THE STUDENT'S COMPREHENSION QUESTION RESPONSE FOR CORRECTNESS.**
+                     **IMPORTANT: CONSIDER  THE STUDENT'S COMPREHENSION QUESTION RESPONSE CORRECT IF IT IS SOMEWHAT CORRECT.**
+                     The student was asked a multiple choice question and a comprehension question.
 			         The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
@@ -459,10 +460,11 @@ def evaluate():
                      If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
                      If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
                      Address the student directly in the output.
-                     Be very lenient when evaluating the student's response for correctness.
+                     **IMPORTANT: BE VERY LENIENT WHEN EVALUATING THE STUDENT'S COMPREHENSION QUESTION RESPONSE FOR CORRECTNESS.**
                      Be mildly encouraging in your response."""
     elif question_type == "fill_in_blanks":
-        prompt = f"""DO NOT EVALUATE ANY FORMAT DISCREPANCIES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER.
+        prompt = f"""**IMPORTANT: DO NOT EVALUATE ANY FORMAT DISCREPANCIES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER.**
+                     **IMPORTANT: IF THERE ARE ANY SPACING DIFFERENCES, DIFFERENCES IN QUOTATION MARKS, DIFFERENCES IN COMMAS, OR DIFFERENCES IN THE ORDER OF NODES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER, CONSIDER THE STUDENT'S RESPONSE CORRECT.**
                      The question that was asked to the student is as follows: "{question_text} . Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
@@ -471,7 +473,7 @@ def evaluate():
                      Be extremely lenient when evaluating the student's response for correctness.
                      If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
                      If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
-                     **IMPORTANT**: Ignore any spacing differences, differences in commas, or differences in the order of nodes between the student's response and the correct answer.
+                     **IMPORTANT: IF THERE ARE ANY SPACING DIFFERENCES, DIFFERENCES IN QUOTATION MARKS, DIFFERENCES IN COMMAS, OR DIFFERENCES IN THE ORDER OF NODES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER, CONSIDER THE STUDENT'S RESPONSE CORRECT.**
                      Address the student directly in the output.
                      Be mildly encouraging in your response."""
     else:
@@ -484,6 +486,8 @@ def evaluate():
                      If the student has selected an incorrect multiple choice option, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
                      Address the student directly in the output.
                      Be mildly encouraging in your response."""
+        
+    print("prompt:", prompt)
 
     # Get GPT feedback
     response = client.chat.completions.create(
