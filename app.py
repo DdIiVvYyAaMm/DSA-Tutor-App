@@ -17,6 +17,11 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.getenv("OPENAI_API_KEY")
+)
+
 QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
     'q2': 'mcq_traversal',
