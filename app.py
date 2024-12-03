@@ -452,16 +452,15 @@ def evaluate():
     
     # Prepare GPT prompt based on question type
     if question_type == 'mcq_code':
-        prompt = f"""**IMPORTANT: BE VERY LENIENT WHEN EVALUATING THE STUDENT'S COMPREHENSION QUESTION RESPONSE FOR CORRECTNESS.**
-                     **IMPORTANT: CONSIDER  THE STUDENT'S COMPREHENSION QUESTION RESPONSE CORRECT IF IT IS SOMEWHAT CORRECT.**
+        prompt = f"""**IMPORTANT: CONSIDER  THE STUDENT'S COMPREHENSION QUESTION RESPONSE CORRECT IF IT IS SOMEWHAT CORRECT.**
                      The student was asked a multiple choice question and a comprehension question.
-			         The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
+                     The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
-			         To the multiple choice question, the student answered:{mcq_answer}.
+                     To the multiple choice question, the student answered:{mcq_answer}.
                      To the comprehension question, the student answered: "{comprehension}".
                      This is the correct answer to the multiple choice:{answers}.
-			         Provide specific feedback for both their multiple choice answer and their comprehension answer.
+                     Provide specific feedback for both their multiple choice answer and their comprehension answer.
                      If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
                      If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
                      Address the student directly in the output.
@@ -469,13 +468,12 @@ def evaluate():
                      Be mildly encouraging in your response."""
     elif question_type == "fill_in_blanks":
         prompt = f"""**IMPORTANT: DO NOT EVALUATE ANY FORMAT DISCREPANCIES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER.**
-                     **IMPORTANT: IF THERE ARE ANY SPACING DIFFERENCES, DIFFERENCES IN QUOTATION MARKS, DIFFERENCES IN COMMAS, OR DIFFERENCES IN THE ORDER OF NODES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER, CONSIDER THE STUDENT'S RESPONSE CORRECT.**
                      The question that was asked to the student is as follows: "{question_text} . Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
                      These are the student's responses to the posed subquestions: "{user_response}". Please disregard the formatting of the student's answer.
                      These are the correct answers for each subquestion:{answers}.
-                     Be extremely lenient when evaluating the student's response for correctness.
+                     Be very lenient when evaluating the student's response for correctness.
                      If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
                      If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
                      **IMPORTANT: IF THERE ARE ANY SPACING DIFFERENCES, DIFFERENCES IN QUOTATION MARKS, DIFFERENCES IN COMMAS, OR DIFFERENCES IN THE ORDER OF NODES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER, CONSIDER THE STUDENT'S RESPONSE CORRECT.**
