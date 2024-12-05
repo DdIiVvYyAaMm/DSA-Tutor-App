@@ -17,10 +17,7 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+
 
 QUESTION_TYPE_MAP = {
     'q1': 'fill_in_blanks',
@@ -452,51 +449,43 @@ def evaluate():
     
     # Prepare GPT prompt based on question type
     if question_type == 'mcq_code':
-        prompt = f"""**IMPORTANT: CONSIDER  THE STUDENT'S COMPREHENSION QUESTION RESPONSE CORRECT IF IT IS SOMEWHAT CORRECT.**
+        prompt = f"""
+                    ANSWER IN AROUND 50 WORDS !!!
                      The student was asked a multiple choice question and a comprehension question.
-                     The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
-                     The Python code provided to the student is as follows:\n{code}\n. 
+                     Question : {question_text}
+                     The Python code provided to the student is as follows:\n{code}\n.
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
-                     To the multiple choice question, the student answered:{mcq_answer}.
-                     To the comprehension question, the student answered: "{comprehension}".
-                     This is the correct answer to the multiple choice:{answers}.
-                     Provide specific feedback for both their multiple choice answer and their comprehension answer.
-                     If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
-                     If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
-                     Address the student directly in the output.
-                     **IMPORTANT: BE VERY LENIENT WHEN EVALUATING THE STUDENT'S COMPREHENSION QUESTION RESPONSE FOR CORRECTNESS.**
-                     Be mildly encouraging in your response."""
+                     These are the student's responses to the posed subquestions: "{user_response}"
+                     These are the correct answers for each subquestion:{answers}.
+                
+                    Put yourself in the shoes of a teacher and craft a feedback that a teacher would provide to help the student learn
+                """
     elif question_type == "fill_in_blanks":
-        prompt = f"""**IMPORTANT: DO NOT EVALUATE ANY FORMAT DISCREPANCIES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER.**
+        prompt = f"""ANSWER IN AROUND 50-75 WORDS !!!
+                     The student was asked a multiple choice question
                      The question that was asked to the student is as follows: "{question_text} . Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
                      These are the student's responses to the posed subquestions: "{user_response}". Please disregard the formatting of the student's answer.
                      These are the correct answers for each subquestion:{answers}.
-                     Be very lenient when evaluating the student's response for correctness.
-                     If the student's response has sufficiently answered the question and is correct or mostly correct, the only output should be congratulating the student and letting them know they answered the question correctly.
-                     If the student has not sufficiently answered the question, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
-                     **IMPORTANT: IF THERE ARE ANY SPACING DIFFERENCES, DIFFERENCES IN QUOTATION MARKS, DIFFERENCES IN COMMAS, OR DIFFERENCES IN THE ORDER OF NODES BETWEEN THE STUDENT'S RESPONSE AND THE CORRECT ANSWER, CONSIDER THE STUDENT'S RESPONSE CORRECT.**
-                     Address the student directly in the output.
-                     Be mildly encouraging in your response."""
+
+                     Put yourself in the shoes of a teacher and craft a feedback that a teacher would provide to help the student learn"""
     else:
-        prompt = f"""The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
+        prompt = f"""ANSWER IN AROUND 50-75 WORDS !!!
+                    The question that was asked to the student is as follows: "{question_text}. Max depth is defined as the number of edges from the root node to the furthest leaf node.". 
                      The Python code provided to the student is as follows:\n{code}\n. 
                      The binary tree dependency that was provided to the students is as follows: {tree_dependency}.
                      This is the student's multiple choice option selection: "{user_response}".
                      This is the correct multiple choice option:{answers}.
-                     If the student has selected the correct multiple choice option, the only output should be congratulating the student and letting them know they answered the question correctly.
-                     If the student has selected an incorrect multiple choice option, output concise, brief feedback and include the correct answer. Avoid heavy terminology and do not include the dependency tree in your feedback message.
-                     Address the student directly in the output.
-                     Be mildly encouraging in your response."""
+                     Put yourself in the shoes of a teacher and craft a feedback that a teacher would provide to help the student learn, try to guide them towards the correct solution"""
         
-    print("prompt:", prompt)
+    print(f"prompt:{prompt}")
 
     # Get GPT feedback
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You are an assistant providing feedback on a student's answer to a question related to binary trees."},
+            {"role": "system", "content": "You are a college professor teaching a intro to data structure course, you are now tasked with evaluating student response to questions and give feedback."},
             {"role": "user", "content": prompt}
         ],
         max_tokens=150,
