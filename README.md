@@ -1,9 +1,47 @@
-# DSA-Tutor-App
-DSA Tutor App for Helping student learn Trees
+# Tree Data Structure tutor web app
 
-git clone the repo.
-ensure you have flask (pip install flask)
+## Demo Video
+[![Project Demo](https://img.youtube.com/vi/nTGUyPBPGFM/0.jpg)]([https://www.youtube.com/watch?v=nTGUyPBPGFM])
 
-Then:
-In the project directory,
-Run on terminal: python app.py
+## Project Report
+[Click here to view the detailed project report](https://drive.google.com/file/d/139ct7m831_U_h8kVLVWX0wej9NEXWT6v/view?usp=sharing)
+
+## Getting Started
+
+These instructions will help you get a copy of the project up and running on your local machine.
+
+### Installation
+
+1. Clone the repository
+
+2. Create and activate virtual environment (optional)
+
+```bash
+python -m venv venv
+# On Windows
+venv\Scripts\activate
+# On macOS/Linux
+source venv/bin/activate
+```
+
+3. Install dependencies
+
+```bash
+pip install openai
+pip install flask
+pip install dotenv
+```
+
+### Running the Application
+
+1. Start the application
+
+```bash
+python import_questions.py
+python app.py
+```
+
+## Authors
+- Shitanshu Bhushan - [GitHub Profile](https://github.com/shitanshubhushan)
+- Divyam
+- Divya
