@@ -1,7 +1,7 @@
 # Tree Data Structure tutor web app
 
 ## Demo Video
-[![Project Demo](https://img.youtube.com/vi/nTGUyPBPGFM/0.jpg)]([https://www.youtube.com/watch?v=nTGUyPBPGFM])
+[![Project Demo](https://img.shields.io/badge/Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=nTGUyPBPGFM)
 
 ## Project Report
 [Click here to view the detailed project report](https://drive.google.com/file/d/139ct7m831_U_h8kVLVWX0wej9NEXWT6v/view?usp=sharing)
